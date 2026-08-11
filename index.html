@@ -777,6 +777,50 @@
         font-size: 15px;
       }
     }
+
+
+    /* ===== 手機銷售紀錄：最後一筆標籤與刪除按鈕固定單行 ===== */
+    @media (max-width: 520px) {
+      #recordsPage #latestOrderCard {
+        padding: 15px;
+      }
+      #recordsPage #latestOrderCard .section-title-row {
+        gap: 7px;
+        margin-bottom: 10px;
+        align-items: center;
+      }
+      #recordsPage #latestOrderCard .section-title-row > div:first-child {
+        flex: 0 0 auto;
+      }
+      #recordsPage #latestOrderCard .pill {
+        white-space: nowrap;
+        flex-wrap: nowrap;
+        padding: 6px 9px;
+        font-size: 11px;
+        line-height: 1.1;
+      }
+      #recordsPage #latestOrderCard .section-title-row > div:last-child {
+        min-width: 0;
+        flex: 1 1 auto;
+        justify-content: flex-end;
+        gap: 6px !important;
+      }
+      #recordsPage #latestOrderCard .order-time {
+        min-width: 0;
+        flex: 1 1 auto;
+        font-size: 13px;
+        line-height: 1.15;
+        text-align: right;
+      }
+      #recordsPage #latestOrderCard .mini-btn {
+        flex: 0 0 auto;
+        white-space: nowrap;
+        padding: 7px 9px;
+        font-size: 11px;
+        line-height: 1.1;
+      }
+    }
+
 </style>
 </head>
 <body>
