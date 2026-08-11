@@ -1131,7 +1131,7 @@
             <div><span class="pill">最後一筆訂單</span></div>
             <div style="display:flex;align-items:center;gap:8px">
               <span class="order-time">${formatDateTime(order.createdAt)}</span>
-
+              <button class="mini-btn" type="button" data-delete-latest="${escapeHTML(order.id)}">刪除此筆</button>
             </div>
           </div>
           <h3>訂單 ${escapeHTML(order.orderNo || order.id)}</h3>
@@ -1207,7 +1207,9 @@
                   <div class="order-no">${formatTime(order.createdAt)}｜${moneyHTML(order.totalAmount)}</div>
                   <div class="order-time">${order.totalTickets} 張｜收現 ${moneyHTML(order.cashReceived)}｜找零 ${moneyHTML(order.change)}</div>
                 </div>
-
+                <div class="order-actions">
+                  <button class="mini-btn" type="button" data-delete-order="${escapeHTML(order.id)}">刪除此筆</button>
+                </div>
               </div>
               <div class="order-items">${itemText || '無票種明細'}</div>
             </article>
@@ -1218,7 +1220,7 @@
           <section class="card daily-card" data-date="${group.dateKey}">
             <div class="daily-head" data-expand-date="${group.dateKey}">
               <div class="daily-title">${formatDate(group.dateKey)} <span class="expand-mark">⌄</span></div>
-              <div class="daily-meta">點此展開 ${group.orders.length} 筆訂單</div>
+              <div class="daily-meta">點此展開 ${group.orders.length} 筆訂單，可逐筆刪除</div>
             </div>
             <div class="daily-stats">
               <div class="small-metric"><div class="small-label">訂單數</div><div class="small-value">${group.orders.length} 筆</div></div>
@@ -1499,7 +1501,18 @@
           if (button) removeTicketType(Number(button.dataset.removeIndex));
         });
 
+        $('#latestOrderCard').addEventListener('click', event => {
+          const button = event.target.closest('[data-delete-latest]');
+          if (button) deleteOrder(button.dataset.deleteLatest);
+        });
+
         $('#dailyGroups').addEventListener('click', event => {
+          const deleteBtn = event.target.closest('[data-delete-order]');
+          if (deleteBtn) {
+            event.stopPropagation();
+            deleteOrder(deleteBtn.dataset.deleteOrder);
+            return;
+          }
           const head = event.target.closest('[data-expand-date]');
           if (head) head.closest('.daily-card').classList.toggle('expanded');
         });
