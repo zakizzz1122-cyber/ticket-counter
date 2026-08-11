@@ -616,17 +616,24 @@
         line-height: 1.2;
         color: #687181;
       }
-      #calculatorPage #totalPeople {
+      #calculatorPage .metric-value {
+        display: flex;
+        align-items: flex-end;
+        min-height: 42px;
         margin-top: 4px;
+        line-height: 1;
+      }
+      #calculatorPage #totalPeople {
         font-size: 32px;
         color: #202632;
-        line-height: 1.05;
+        justify-content: flex-start;
       }
       #calculatorPage #totalAmount {
-        margin-top: 4px;
         font-size: 40px;
         color: #a64b3c;
         white-space: nowrap;
+        justify-content: flex-start;
+        gap: 6px;
       }
       #calculatorPage #totalAmount .currency-prefix {
         font-size: .56em;
@@ -716,6 +723,60 @@
       }
     }
 
+
+
+    /* ===== 手機版頂部壓縮：增加單一畫面可視範圍 ===== */
+    @media (max-width: 520px) {
+      .topbar {
+        padding: max(5px, env(safe-area-inset-top)) 8px 5px;
+      }
+      .tabs {
+        gap: 4px;
+        padding: 3px;
+        border-radius: 12px;
+      }
+      .tab-btn {
+        padding: 6px 7px;
+        border-radius: 8px;
+        font-size: 16px;
+        line-height: 1.15;
+      }
+      main {
+        padding-top: 5px;
+      }
+      .hero,
+      #calculatorPage .hero {
+        margin: 0 2px 5px;
+        gap: 7px;
+        min-height: 36px;
+      }
+      .hero-badge,
+      #calculatorPage .hero-badge {
+        display: none;
+      }
+      .hero-title,
+      #calculatorPage .hero-title {
+        gap: 0;
+      }
+      .hero h1,
+      #calculatorPage h1 {
+        font-size: 18px;
+        line-height: 1.1;
+        letter-spacing: -.02em;
+      }
+      .hero .subtitle,
+      #calculatorPage .subtitle {
+        margin-top: 1px;
+        font-size: 11px;
+        line-height: 1.15;
+      }
+      #calculatorPage .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 11px;
+        font-size: 15px;
+      }
+    }
 </style>
 </head>
 <body>
