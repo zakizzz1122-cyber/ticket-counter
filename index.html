@@ -1,0 +1,2257 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7f8fb" />
+  <title>票價計算器</title>
+  <style>
+    :root {
+      --bg: linear-gradient(180deg, #f6f7fb 0%, #eef2f8 100%);
+      --card: rgba(255, 255, 255, .96);
+      --text: #1d2433;
+      --muted: #747d90;
+      --line: #e6e9f0;
+      --primary: #4b75e8;
+      --primary-dark: #345dcc;
+      --danger: #e25555;
+      --danger-soft: #fff1f1;
+      --success: #209765;
+      --success-soft: #eaf9f2;
+      --shadow: 0 12px 34px rgba(42, 55, 86, .10);
+      --shadow-soft: 0 6px 18px rgba(42, 55, 86, .07);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { touch-action: manipulation; }
+
+    .app-shell { width: min(760px, 100%); margin: 0 auto; min-height: 100vh; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      padding: max(12px, env(safe-area-inset-top)) 14px 10px;
+      background: rgba(246,248,252,.88);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(230,233,240,.85);
+      box-shadow: 0 4px 20px rgba(42,55,86,.05);
+    }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding: 5px;
+      background: linear-gradient(180deg, #e9edf5 0%, #e5eaf4 100%);
+      border-radius: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.45);
+    }
+    .tab-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 10px;
+      color: #697386;
+      background: transparent;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      color: var(--text);
+      background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+      box-shadow: 0 5px 14px rgba(45,55,80,.11);
+    }
+
+    main { padding: 10px 12px calc(18px + env(safe-area-inset-bottom)); }
+    .page { display: none; }
+    .page.active { display: block; }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 0 2px 9px;
+    }
+    .hero-title { display: flex; align-items: center; gap: 12px; }
+    .hero-badge {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 13px;
+      background: linear-gradient(145deg, #ffe67f 0%, #f9cb40 100%);
+      box-shadow: 0 10px 24px rgba(199,155,27,.24), inset 0 1px 1px rgba(255,255,255,.55);
+      color: #553f00;
+      font-size: 21px;
+    }
+    h1 { margin: 0; font-size: clamp(23px, 5vw, 31px); letter-spacing: -.04em; }
+    h2 { margin: 0; font-size: 20px; }
+    h3 { margin: 0; font-size: 17px; }
+    .subtitle { margin: 2px 0 0; color: var(--muted); font-size: 12px; }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      border: 1px solid rgba(219,224,234,.95);
+      border-radius: 14px;
+      background: linear-gradient(180deg, #ffffff 0%, #f5f7fc 100%);
+      color: #596276;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(42,55,86,.08);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(230,233,240,.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .ticket-list { display: grid; gap: 7px; }
+    .ticket-row {
+      display: grid;
+      grid-template-columns: minmax(112px,1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    .ticket-row::before {
+      content: '';
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: linear-gradient(180deg, #ffd760 0%, #f2b51f 100%);
+      opacity: .9;
+    }
+    .ticket-main { min-width: 0; }
+    .ticket-name { font-size: 17px; font-weight: 950; overflow-wrap: anywhere; line-height: 1.35; }
+    .ticket-inline-price { color: #596276; font-size: 14px; font-weight: 850; white-space: nowrap; }
+
+    .ticket-right { display: grid; justify-items: end; gap: 3px; }
+    .stepper { display: grid; grid-template-columns: 54px 48px 54px; align-items: center; gap: 5px; }
+    .stepper button {
+      width: 54px;
+      height: 54px;
+      border: 0;
+      border-radius: 16px;
+      color: #fff;
+      font-size: 28px;
+      line-height: 1;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(42,55,86,.12), inset 0 1px 1px rgba(255,255,255,.25);
+      text-shadow: 0 1px 0 rgba(0,0,0,.1);
+    }
+    .stepper button[data-action="decrease"] {
+      background: linear-gradient(180deg, #ef4b4b 0%, #d92e2e 100%);
+    }
+    .stepper button[data-action="increase"] {
+      background: linear-gradient(180deg, #41af4f 0%, #2f8e3b 100%);
+    }
+    .stepper button:active { transform: scale(.96); }
+    .count {
+      min-width: 48px;
+      text-align: center;
+      font-size: 31px;
+      font-weight: 950;
+      font-variant-numeric: tabular-nums;
+      color: #111826;
+    }
+    .ticket-subtotal {
+      color: #2b6ecb;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .ticket-subtotal strong {
+      font-size: 13px;
+      font-weight: 950;
+    }
+
+    .summary-card { margin-top: 8px; overflow: hidden; }
+    .summary-top { display: grid; grid-template-columns: 1fr 1fr; }
+    .metric { padding: 10px 13px; }
+    .metric + .metric { border-left: 1px solid var(--line); }
+    .metric-label { color: var(--muted); font-weight: 800; font-size: 16px; }
+    .metric-value { margin-top: 2px; font-size: 23px; font-weight: 950; font-variant-numeric: tabular-nums; }
+    #totalAmount { font-size: 31px; color: #CD5C5C; font-weight: 950; }
+
+    .cash-section { border-top: 1px solid var(--line); padding: 10px 13px; }
+    .field-label { display: block; color: #586176; font-size: 16px; font-weight: 850; margin-bottom: 8px; }
+    .money-input-wrap { position: relative; }
+    .money-prefix {
+      position: absolute;
+      top: 50%; left: 14px;
+      transform: translateY(-50%);
+      color: #6e778a;
+      font-weight: 900;
+    }
+    .money-input {
+      width: 100%;
+      height: 46px;
+      border: 1px solid #dce1eb;
+      border-radius: 14px;
+      padding: 0 14px 0 52px;
+      outline: none;
+      background: #fafbfe;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+    }
+    .money-input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(75,117,232,.12); background: #fff; }
+    .change-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 8px;
+      padding: 13px 15px;
+      min-height: 62px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #f4f6fb 0%, #edf1f7 100%);
+      box-shadow: inset 0 1px 1px rgba(255,255,255,.9);
+      font-size: 19px;
+    }
+    .change-box.positive { background: var(--success-soft); color: #157c53; }
+    .change-box.negative { background: var(--danger-soft); color: #ba3d3d; }
+    .change-amount { font-size: 31px; font-weight: 950; font-variant-numeric: tabular-nums; color: #CD5C5C; }
+
+    .action-row { display: grid; grid-template-columns: .75fr 1.35fr; gap: 8px; margin-top: 8px; }
+    .btn {
+      min-height: 48px;
+      border: 0;
+      border-radius: 15px;
+      padding: 12px 14px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .btn.secondary { color: #5d6678; background: linear-gradient(180deg, #edf1f7 0%, #e4e9f2 100%); box-shadow: var(--shadow-soft); }
+    .btn.primary { color: #fff; background: linear-gradient(180deg, #5f87f2 0%, #4269db 100%); box-shadow: 0 10px 20px rgba(75,117,232,.24); }
+    .btn.primary:hover { background: var(--primary-dark); }
+    .btn.danger { color: #bf4141; background: var(--danger-soft); }
+    .btn.outline { color: #526078; background: #fff; border: 1px solid var(--line); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+    .record-toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+    .record-toolbar .btn { min-height: 42px; padding: 9px 13px; border-radius: 12px; font-size: 14px; }
+
+    .latest-card { padding: 17px; margin-bottom: 14px; }
+    .section-title-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: #eef2ff;
+      color: #4266c4;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .order-time { color: var(--muted); font-size: 13px; font-weight: 700; }
+    .item-lines { display: grid; gap: 7px; margin-top: 12px; }
+    .item-line, .total-line { display: flex; justify-content: space-between; gap: 12px; }
+    .item-line { color: #4d5668; }
+    .total-line { border-top: 1px dashed #dfe3eb; margin-top: 11px; padding-top: 11px; font-weight: 950; font-size: 18px; }
+
+    .date-filter {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .date-input {
+      width: 100%;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 0 12px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    .daily-groups { display: grid; gap: 13px; }
+    .daily-card { overflow: hidden; }
+    .daily-head { padding: 16px; cursor: pointer; user-select: none; }
+    .daily-title { font-size: 18px; font-weight: 950; }
+    .daily-meta { margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .daily-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      background: #fafbfe;
+    }
+    .small-metric { padding: 12px 9px; text-align: center; }
+    .small-metric + .small-metric { border-left: 1px solid var(--line); }
+    .small-label { color: var(--muted); font-size: 12px; font-weight: 750; }
+    .small-value { margin-top: 3px; font-weight: 950; font-variant-numeric: tabular-nums; }
+    .daily-ticket-summary { padding: 14px 16px; }
+    .ticket-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px;
+    }
+    .ticket-summary-item {
+      padding: 11px 12px;
+      border: 1px solid #e5e9f1;
+      border-radius: 13px;
+      background: linear-gradient(180deg, #fff 0%, #f8faff 100%);
+    }
+    .ticket-summary-name { color: #687286; font-size: 12px; font-weight: 850; }
+    .ticket-summary-qty { margin-top: 3px; font-size: 20px; font-weight: 950; color: #1e293b; }
+    .ticket-summary-money { margin-top: 2px; color: #3970c8; font-size: 12px; font-weight: 850; }
+
+    .orders-wrap { display: none; padding: 0 12px 12px; }
+    .daily-card.expanded .orders-wrap { display: grid; gap: 8px; }
+    .order-entry { border: 1px solid var(--line); border-radius: 13px; padding: 12px; background: #fff; }
+    .order-entry-head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .order-no { font-weight: 900; }
+    .order-actions { display: flex; gap: 6px; }
+    .mini-btn { border: 0; border-radius: 9px; padding: 6px 8px; cursor: pointer; color: #b14242; background: var(--danger-soft); font-weight: 800; font-size: 12px; }
+    .order-items { margin-top: 7px; color: #5b6475; font-size: 14px; line-height: 1.7; }
+
+    .empty-state { text-align: center; padding: 38px 18px; color: var(--muted); }
+    .empty-icon { font-size: 42px; margin-bottom: 8px; }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(20,26,40,.48);
+    }
+    .modal-backdrop.open { display: grid; }
+    .modal {
+      width: min(560px, 100%);
+      max-height: min(82vh, 760px);
+      overflow: auto;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 20px 70px rgba(18,25,45,.25);
+    }
+    .modal-head { position: sticky; top: 0; display: flex; justify-content: space-between; align-items: center; padding: 16px; background: #fff; border-bottom: 1px solid var(--line); z-index: 1; }
+    .modal-body { padding: 16px; }
+    .settings-list { display: grid; gap: 10px; }
+    .settings-row { display: grid; grid-template-columns: 1.2fr .8fr auto; gap: 8px; }
+    .text-input {
+      width: 100%; min-width: 0; height: 44px; border: 1px solid var(--line); border-radius: 11px; padding: 0 11px; outline: 0;
+    }
+    .text-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(75,117,232,.11); }
+    .remove-type { width: 44px; border: 0; border-radius: 11px; background: var(--danger-soft); color: #bf4141; cursor: pointer; font-weight: 900; }
+    .settings-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+    .help-text { color: var(--muted); font-size: 13px; line-height: 1.6; margin: 0 0 12px; }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(20px + env(safe-area-inset-bottom));
+      z-index: 200;
+      transform: translate(-50%, 20px);
+      opacity: 0;
+      pointer-events: none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      color: #fff;
+      background: #222b3a;
+      box-shadow: 0 8px 30px rgba(0,0,0,.2);
+      font-weight: 800;
+      transition: .22s ease;
+      white-space: nowrap;
+      max-width: calc(100vw - 28px);
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    @media (max-width: 440px) {
+      .ticket-row { grid-template-columns: minmax(105px,1fr) auto; padding: 13px 12px; }
+      .ticket-right { justify-items: end; }
+      .stepper { grid-template-columns: 58px 50px 58px; width: auto; gap: 5px; }
+      .stepper button { width: 58px; }
+      .count { min-width: 50px; }
+      .ticket-subtotal { text-align: right; }
+      .ticket-summary-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .summary-top { grid-template-columns: 1fr 1.2fr; }
+      .metric { padding: 16px 13px; }
+      .metric-value { font-size: 23px; }
+      .settings-row { grid-template-columns: 1fr 100px 42px; }
+    }
+  
+    @media (max-width: 520px) {
+      .topbar { padding-bottom: 7px; }
+      .tab-btn { padding: 9px 8px; }
+      #calculatorPage .hero { margin-bottom: 7px; }
+      #calculatorPage .ticket-row { min-height: 68px; }
+      #calculatorPage .hero-badge { display: none; }
+      #calculatorPage .hero-title { gap: 0; }
+      #calculatorPage .stepper { grid-template-columns: 54px 44px 54px; }
+      #calculatorPage .count { min-width: 44px; }
+      #calculatorPage .metric-label, #calculatorPage .field-label { font-size: 15px; }
+      #calculatorPage .ticket-inline-price { display: block; margin-top: 1px; }
+    }
+
+    .expand-mark { display: inline-block; transition: transform .18s ease; color: #70809b; }
+    .daily-card.expanded .expand-mark { transform: rotate(180deg); }
+
+    @media (max-width: 520px) {
+      #calculatorPage .ticket-row { padding: 7px 10px; min-height: 66px; }
+      #calculatorPage .stepper { grid-template-columns: 52px 42px 52px; gap: 4px; }
+      #calculatorPage .stepper button { width: 52px; height: 52px; border-radius: 15px; font-size: 30px; }
+      #calculatorPage .count { min-width: 42px; font-size: 27px; }
+      #calculatorPage .ticket-name { font-size: 16px; }
+      #calculatorPage .ticket-inline-price { font-size: 13px; }
+      #calculatorPage .metric { padding: 9px 11px; }
+      #calculatorPage .metric-value { font-size: 22px; }
+      #calculatorPage #totalAmount { font-size: 30px; }
+      #calculatorPage .change-amount { font-size: 30px; }
+      #calculatorPage .change-box { min-height: 60px; padding: 12px 13px; }
+      #calculatorPage .cash-section { padding: 8px 11px; }
+      #calculatorPage .money-input { height: 44px; }
+      #calculatorPage .change-box { margin-top: 7px; min-height: 60px; padding: 12px 13px; }
+      #calculatorPage .action-row { margin-top: 7px; }
+      #calculatorPage .btn { min-height: 46px; }
+    }
+
+    /* 2026-08-11：加大總數與票種文字 */
+    #totalPeople {
+      font-size: 31px;
+      font-weight: 950;
+    }
+    #calculatorPage .ticket-name {
+      font-size: 20px;
+      line-height: 1.25;
+    }
+    #calculatorPage .ticket-inline-price {
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    @media (max-width: 520px) {
+      #calculatorPage #totalPeople { font-size: 31px; }
+      #calculatorPage .ticket-name { font-size: 19px; }
+      #calculatorPage .ticket-inline-price { font-size: 16px; }
+    }
+
+
+
+    /* 2026-08-11：手機快速收現數字鍵盤 */
+    .cash-display-wrap {
+      position: relative;
+    }
+    .money-input.keypad-display {
+      cursor: default;
+      caret-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .cash-keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      margin-top: 7px;
+    }
+    .cash-key {
+      min-height: 48px;
+      border: 1px solid #dce1eb;
+      border-radius: 13px;
+      background: linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%);
+      color: #1d2433;
+      font-size: 24px;
+      font-weight: 950;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(42,55,86,.06);
+    }
+    .cash-key:active { transform: scale(.97); background: #edf1f7; }
+    .cash-key.utility {
+      color: #276c50;
+      background: linear-gradient(180deg, #eef8f3 0%, #e3f1ea 100%);
+      font-size: 18px;
+    }
+    .cash-key.backspace { font-size: 22px; }
+
+    @media (max-width: 520px) {
+      /* 計票頁以一個手機視窗完成操作：隱藏非必要標題，保留大按鍵 */
+      #calculatorPage .hero { display: none; }
+      main { padding-top: 8px; }
+      .ticket-list { gap: 6px; }
+      #calculatorPage .ticket-row {
+        min-height: 57px;
+        padding: 5px 10px;
+        border-radius: 18px;
+      }
+      #calculatorPage .ticket-name { font-size: 18px; line-height: 1.12; }
+      #calculatorPage .ticket-inline-price { display: inline; margin: 0; font-size: 15px; }
+      #calculatorPage .stepper { grid-template-columns: 49px 40px 49px; gap: 4px; }
+      #calculatorPage .stepper button {
+        width: 49px;
+        height: 49px;
+        border-radius: 14px;
+        font-size: 29px;
+      }
+      #calculatorPage .count { min-width: 40px; font-size: 26px; }
+      #calculatorPage .summary-card { margin-top: 7px; border-radius: 18px; }
+      #calculatorPage .metric { padding: 7px 11px; }
+      #calculatorPage .metric-label { font-size: 14px; }
+      #calculatorPage #totalPeople,
+      #calculatorPage #totalAmount { font-size: 27px; margin-top: 0; }
+      #calculatorPage .cash-section { padding: 7px 10px 8px; }
+      #calculatorPage .field-label { font-size: 15px; margin-bottom: 5px; }
+      #calculatorPage .money-input { height: 42px; font-size: 22px; border-radius: 12px; }
+      #calculatorPage .cash-keypad { gap: 5px; margin-top: 5px; }
+      #calculatorPage .cash-key { min-height: 43px; border-radius: 11px; font-size: 22px; }
+      #calculatorPage .cash-key.utility { font-size: 17px; }
+      #calculatorPage .change-box {
+        min-height: 44px;
+        margin-top: 5px;
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-size: 17px;
+      }
+      #calculatorPage .change-amount { font-size: 26px; }
+      #calculatorPage .action-row { margin-top: 6px; }
+      #calculatorPage .btn { min-height: 44px; padding: 8px 10px; font-size: 16px; }
+    }
+
+    @media (max-width: 390px), (max-height: 720px) {
+      .topbar { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 6px; }
+      .tab-btn { padding: 8px 7px; }
+      #calculatorPage .ticket-row { min-height: 53px; padding-top: 3px; padding-bottom: 3px; }
+      #calculatorPage .stepper { grid-template-columns: 46px 36px 46px; }
+      #calculatorPage .stepper button { width: 46px; height: 46px; }
+      #calculatorPage .count { min-width: 36px; font-size: 24px; }
+      #calculatorPage .cash-key { min-height: 40px; }
+      #calculatorPage .metric { padding-top: 5px; padding-bottom: 5px; }
+      #calculatorPage .cash-section { padding-top: 5px; padding-bottom: 6px; }
+      #calculatorPage .money-input { height: 39px; }
+      #calculatorPage .change-box { min-height: 40px; }
+      #calculatorPage .btn { min-height: 41px; }
+    }
+
+
+
+    /* 2026-08-11：收現金額放大＋數字鍵盤窄版集中 */
+    #calculatorPage .money-input.keypad-display {
+      height: 58px;
+      padding-left: 58px;
+      padding-right: 16px;
+      font-size: 32px;
+      font-weight: 950;
+      color: #CD5C5C;
+      text-align: right;
+      letter-spacing: .01em;
+    }
+    #calculatorPage .cash-display-wrap .money-prefix {
+      font-size: 21px;
+      font-weight: 950;
+      color: #6e778a;
+    }
+    #calculatorPage .cash-keypad {
+      width: min(300px, 88%);
+      margin: 7px auto 0;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+    #calculatorPage .cash-key {
+      min-height: 50px;
+      padding: 0;
+      font-size: 24px;
+    }
+
+    @media (max-width: 520px) {
+      #calculatorPage .money-input.keypad-display {
+        height: 56px;
+        font-size: 31px;
+        border-radius: 13px;
+      }
+      #calculatorPage .cash-display-wrap .money-prefix { font-size: 20px; }
+      #calculatorPage .cash-keypad {
+        width: min(286px, 86vw);
+        gap: 5px;
+        margin-top: 6px;
+      }
+      #calculatorPage .cash-key {
+        min-height: 48px;
+        border-radius: 12px;
+        font-size: 23px;
+      }
+      #calculatorPage .cash-key.utility { font-size: 17px; }
+    }
+
+    @media (max-width: 390px), (max-height: 720px) {
+      #calculatorPage .money-input.keypad-display {
+        height: 52px;
+        font-size: 29px;
+      }
+      #calculatorPage .cash-keypad { width: min(272px, 84vw); gap: 4px; }
+      #calculatorPage .cash-key { min-height: 44px; }
+    }
+
+
+
+    /* 2026-08-11：收現資訊與數字鍵盤同列、去除小圖示、質感版 */
+    #calculatorPage .cash-section {
+      padding: 10px 12px;
+    }
+    #calculatorPage .cash-composer {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 218px;
+      gap: 12px;
+      align-items: stretch;
+    }
+    #calculatorPage .cash-info-panel {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+    #calculatorPage .field-label,
+    #calculatorPage .metric-label {
+      color: #667085;
+      font-weight: 900;
+      letter-spacing: .01em;
+    }
+    #calculatorPage .money-input.keypad-display {
+      height: 62px;
+      font-size: 34px;
+      background: linear-gradient(180deg, #ffffff 0%, #fafbfe 100%);
+      border: 1px solid #dfe4ec;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
+    }
+    #calculatorPage .change-box {
+      flex: 1;
+      min-height: 62px;
+      margin-top: 8px;
+      padding: 10px 14px;
+      border: 1px solid #e1e6ee;
+      background: linear-gradient(180deg, #f8fafc 0%, #f1f4f8 100%);
+    }
+    #calculatorPage .change-box strong {
+      font-size: 18px;
+      color: #465166;
+    }
+    #calculatorPage .change-amount {
+      font-size: 30px;
+      color: #CD5C5C;
+    }
+    #calculatorPage .cash-keypad {
+      width: 218px;
+      margin: 0;
+      gap: 5px;
+      align-self: stretch;
+    }
+    #calculatorPage .cash-key {
+      min-height: 50px;
+      border-radius: 12px;
+      border: 1px solid #dde3eb;
+      background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
+      color: #1f2937;
+      box-shadow: 0 3px 8px rgba(42,55,86,.06), inset 0 1px 0 rgba(255,255,255,.95);
+    }
+    #calculatorPage .cash-key.utility {
+      color: #536075;
+      background: linear-gradient(180deg, #f2f5f8 0%, #e9eef4 100%);
+    }
+    #calculatorPage .metric-label,
+    #calculatorPage .field-label { font-size: 16px; }
+
+    @media (max-width: 520px) {
+      #calculatorPage .cash-section { padding: 8px 10px; }
+      #calculatorPage .cash-composer {
+        grid-template-columns: minmax(0, 1fr) 204px;
+        gap: 9px;
+      }
+      #calculatorPage .money-input.keypad-display {
+        height: 58px;
+        font-size: 32px;
+      }
+      #calculatorPage .change-box {
+        min-height: 58px;
+        margin-top: 6px;
+        padding: 8px 11px;
+      }
+      #calculatorPage .change-box strong { font-size: 17px; }
+      #calculatorPage .change-amount { font-size: 28px; }
+      #calculatorPage .cash-keypad { width: 204px; gap: 4px; }
+      #calculatorPage .cash-key { min-height: 45px; font-size: 22px; border-radius: 11px; }
+      #calculatorPage .cash-key.utility { font-size: 15px; }
+      #calculatorPage .metric-label,
+      #calculatorPage .field-label { font-size: 15px; }
+    }
+
+    @media (max-width: 390px), (max-height: 720px) {
+      #calculatorPage .cash-composer {
+        grid-template-columns: minmax(0, 1fr) 190px;
+        gap: 7px;
+      }
+      #calculatorPage .money-input.keypad-display { height: 54px; font-size: 29px; }
+      #calculatorPage .change-box { min-height: 54px; }
+      #calculatorPage .change-amount { font-size: 25px; }
+      #calculatorPage .cash-keypad { width: 190px; }
+      #calculatorPage .cash-key { min-height: 41px; font-size: 20px; }
+    }
+
+    /* 2026-08-11：收現區再縮窄、鍵盤加大 */
+    #calculatorPage .cash-composer {
+      grid-template-columns: minmax(0, 0.68fr) 238px;
+      gap: 6px;
+    }
+    #calculatorPage .cash-keypad {
+      width: 238px;
+      gap: 5px;
+    }
+    #calculatorPage .cash-key {
+      min-height: 52px;
+      font-size: 25px;
+      border-radius: 12px;
+    }
+    #calculatorPage .cash-key.utility { font-size: 17px; }
+
+    @media (max-width: 520px) {
+      #calculatorPage .cash-composer {
+        grid-template-columns: minmax(0, 1fr) 228px;
+        gap: 6px;
+      }
+      #calculatorPage .cash-keypad { width: 228px; gap: 5px; }
+      #calculatorPage .cash-key { min-height: 49px; font-size: 24px; }
+      #calculatorPage .cash-info-panel { min-width: 0; }
+      #calculatorPage .money-input.keypad-display {
+        padding-left: 48px;
+        padding-right: 10px;
+        font-size: 30px;
+      }
+      #calculatorPage .cash-display-wrap .money-prefix { left: 11px; font-size: 18px; }
+      #calculatorPage .change-box { padding-left: 10px; padding-right: 10px; }
+      #calculatorPage .change-box strong { font-size: 16px; }
+      #calculatorPage .change-amount { font-size: 27px; }
+    }
+
+    @media (max-width: 390px), (max-height: 720px) {
+      #calculatorPage .cash-composer {
+        grid-template-columns: minmax(0, 1fr) 214px;
+        gap: 5px;
+      }
+      #calculatorPage .cash-keypad { width: 214px; gap: 4px; }
+      #calculatorPage .cash-key { min-height: 46px; font-size: 23px; }
+      #calculatorPage .money-input.keypad-display { font-size: 27px; }
+      #calculatorPage .change-amount { font-size: 24px; }
+    }
+
+
+
+    /* 2026-08-11：收現區最終排版—鍵盤填滿右側，不留空白 */
+    #calculatorPage .cash-composer {
+      display: grid;
+      grid-template-columns: minmax(0, 42%) minmax(0, 58%);
+      gap: 8px;
+      width: 100%;
+      align-items: stretch;
+    }
+    #calculatorPage .cash-info-panel {
+      width: 100%;
+      min-width: 0;
+    }
+    #calculatorPage .cash-keypad {
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      align-self: stretch;
+    }
+    #calculatorPage .cash-key {
+      width: 100%;
+      min-width: 0;
+      min-height: 52px;
+      font-size: 25px;
+    }
+
+    @media (max-width: 520px) {
+      #calculatorPage .cash-composer {
+        grid-template-columns: minmax(0, 41%) minmax(0, 59%);
+        gap: 7px;
+      }
+      #calculatorPage .cash-keypad {
+        width: 100%;
+        max-width: none;
+        gap: 5px;
+      }
+      #calculatorPage .cash-key {
+        width: 100%;
+        min-height: 49px;
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 390px), (max-height: 720px) {
+      #calculatorPage .cash-composer {
+        grid-template-columns: minmax(0, 40%) minmax(0, 60%);
+        gap: 6px;
+      }
+      #calculatorPage .cash-keypad {
+        width: 100%;
+        max-width: none;
+        gap: 4px;
+      }
+      #calculatorPage .cash-key {
+        width: 100%;
+        min-height: 46px;
+        font-size: 23px;
+      }
+    }
+</style>
+
+<style>
+
+  #calculatorPage .cash-section {
+    background: #FFFCEB;
+  }
+
+  #calculatorPage .money-input.keypad-display {
+    color: #549688;
+  }
+
+  #calculatorPage .money-input.keypad-display::placeholder {
+    color: #9aa3af;
+  }
+
+  #calculatorPage .cash-display-wrap .money-prefix {
+    color: #549688;
+  }
+
+
+
+  /* 標題縮小，讓視覺重點回到售票操作 */
+  #calculatorPage h1 {
+    font-size: clamp(19px, 4.2vw, 24px);
+    line-height: 1.15;
+  }
+  #calculatorPage .subtitle {
+    font-size: 12px;
+  }
+
+  /* 票種名稱與票價放大 */
+  #calculatorPage .ticket-name {
+    font-size: 21px;
+    line-height: 1.18;
+  }
+  #calculatorPage .ticket-inline-price {
+    font-size: 18px;
+    font-weight: 900;
+  }
+
+  /* 票數與加減按鈕放大 */
+  #calculatorPage .count {
+    font-size: 34px;
+  }
+  #calculatorPage .stepper button {
+    font-size: 33px;
+  }
+
+  /* 總數 / 總金額 / 收現金額標籤與數字放大 */
+  #calculatorPage .metric-label,
+  #calculatorPage .field-label {
+    font-size: 18px;
+  }
+  #calculatorPage #totalPeople {
+    font-size: 34px;
+  }
+  #calculatorPage #totalAmount {
+    font-size: 36px;
+    color: #CD5C5C;
+  }
+  #calculatorPage .money-input.keypad-display {
+    font-size: 35px;
+    font-weight: 950;
+  }
+  #calculatorPage .cash-display-wrap .money-prefix {
+    font-size: 21px;
+    font-weight: 950;
+  }
+
+  /* 找零與數字鍵盤同步放大 */
+  #calculatorPage .change-box strong {
+    font-size: 19px;
+  }
+  #calculatorPage .change-amount {
+    font-size: 32px;
+  }
+  #calculatorPage .cash-key {
+    font-size: 27px;
+    font-weight: 950;
+  }
+  #calculatorPage .cash-key.utility {
+    font-size: 18px;
+  }
+  #calculatorPage .action-row .btn {
+    font-size: 18px;
+  }
+
+  @media (max-width: 520px) {
+    #calculatorPage h1 { font-size: 20px; }
+    #calculatorPage .ticket-name { font-size: 20px; }
+    #calculatorPage .ticket-inline-price { font-size: 17px; }
+    #calculatorPage .count { font-size: 32px; }
+    #calculatorPage .stepper button { font-size: 32px; }
+    #calculatorPage .metric-label,
+    #calculatorPage .field-label { font-size: 17px; }
+    #calculatorPage #totalPeople { font-size: 32px; }
+    #calculatorPage #totalAmount { font-size: 34px; }
+    #calculatorPage .money-input.keypad-display { font-size: 33px; }
+    #calculatorPage .cash-display-wrap .money-prefix { font-size: 20px; }
+    #calculatorPage .change-box strong { font-size: 18px; }
+    #calculatorPage .change-amount { font-size: 30px; }
+    #calculatorPage .cash-key { font-size: 26px; }
+    #calculatorPage .cash-key.utility { font-size: 17px; }
+    #calculatorPage .action-row .btn { font-size: 17px; }
+  }
+
+  /* 較矮手機避免因放大而超出一個畫面 */
+  @media (max-height: 720px) {
+    #calculatorPage .ticket-name { font-size: 19px; }
+    #calculatorPage .ticket-inline-price { font-size: 16px; }
+    #calculatorPage #totalPeople { font-size: 30px; }
+    #calculatorPage #totalAmount { font-size: 32px; }
+    #calculatorPage .money-input.keypad-display { font-size: 31px; }
+    #calculatorPage .change-amount { font-size: 28px; }
+    #calculatorPage .cash-key { font-size: 24px; }
+  }
+
+</style>
+
+<style>
+  /* ===== 2026-08-11：收現同格・質感版 ===== */
+
+  #calculatorPage .cash-section {
+    background:
+      radial-gradient(circle at 8% 0%, rgba(255,255,255,.88), transparent 34%),
+      linear-gradient(145deg, #FFFDF3 0%, #FFFCEB 55%, #FFF8D9 100%);
+    border-top: 1px solid #eee5bf;
+    padding: 12px;
+  }
+
+  #calculatorPage .cash-composer {
+    gap: 10px;
+    align-items: stretch;
+  }
+
+  /* 收現標題＋金額合併成同一格 */
+  #calculatorPage .cash-info-panel > .field-label {
+    margin: 0;
+    padding: 10px 14px 2px;
+    color: #6f756f;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: .04em;
+    background: linear-gradient(180deg, #ffffff 0%, #fffefa 100%);
+    border: 1px solid #e5dfc7;
+    border-bottom: 0;
+    border-radius: 17px 17px 0 0;
+    box-shadow:
+      0 8px 20px rgba(83, 76, 50, .06),
+      inset 0 1px 0 rgba(255,255,255,.95);
+  }
+
+  #calculatorPage .cash-display-wrap {
+    position: relative;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(180deg, #fffefa 0%, #ffffff 100%);
+    border: 1px solid #e5dfc7;
+    border-top: 0;
+    border-radius: 0 0 17px 17px;
+    overflow: hidden;
+    box-shadow:
+      0 10px 24px rgba(83, 76, 50, .075),
+      inset 0 -1px 0 rgba(255,255,255,.9);
+  }
+
+  #calculatorPage .money-input.keypad-display {
+    height: 62px;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+    background: transparent;
+    box-shadow: none;
+    padding-left: 58px;
+    padding-right: 14px;
+    color: #549688;
+    font-size: 34px;
+    font-weight: 950;
+    text-align: right;
+    letter-spacing: .01em;
+  }
+
+  #calculatorPage .money-input.keypad-display:focus {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  #calculatorPage .cash-display-wrap .money-prefix {
+    left: 14px;
+    color: #549688;
+    font-size: 20px;
+    font-weight: 950;
+    letter-spacing: .01em;
+  }
+
+  #calculatorPage .money-input.keypad-display::placeholder {
+    color: #b7b9b0;
+    opacity: 1;
+  }
+
+  /* 找零區：比收現卡片低一階，避免搶焦點 */
+  #calculatorPage .change-box {
+    margin-top: 9px;
+    min-height: 60px;
+    padding: 10px 14px;
+    border: 1px solid rgba(218, 214, 196, .95);
+    border-radius: 15px;
+    background: rgba(255,255,255,.72);
+    box-shadow:
+      0 5px 14px rgba(83, 76, 50, .045),
+      inset 0 1px 0 rgba(255,255,255,.9);
+  }
+
+  #calculatorPage .change-box strong {
+    color: #626a73;
+    font-size: 17px;
+    font-weight: 900;
+  }
+
+  #calculatorPage .change-amount {
+    color: #CD5C5C;
+    font-size: 29px;
+    font-weight: 950;
+  }
+
+  /* 鍵盤：乾淨、柔和、有實體按鍵感 */
+  #calculatorPage .cash-keypad {
+    gap: 7px;
+  }
+
+  #calculatorPage .cash-key {
+    min-height: 52px;
+    border: 1px solid #dde1e5;
+    border-radius: 13px;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f6f4 100%);
+    color: #283039;
+    font-size: 25px;
+    font-weight: 950;
+    box-shadow:
+      0 4px 10px rgba(42,55,86,.07),
+      inset 0 1px 0 rgba(255,255,255,.96);
+    transition: transform .08s ease, box-shadow .08s ease, background .08s ease;
+  }
+
+  #calculatorPage .cash-key:active {
+    transform: translateY(1px) scale(.985);
+    background: #eef0ec;
+    box-shadow:
+      0 2px 5px rgba(42,55,86,.06),
+      inset 0 1px 2px rgba(60,70,80,.06);
+  }
+
+  #calculatorPage .cash-key.utility {
+    color: #59636b;
+    background: linear-gradient(180deg, #f2f4f2 0%, #e9edea 100%);
+    border-color: #d9dfdc;
+  }
+
+  /* 總結區稍微收斂，讓收現卡片成為視覺主角 */
+  #calculatorPage .summary-top {
+    background: linear-gradient(180deg, #ffffff 0%, #fcfcfa 100%);
+  }
+
+  #calculatorPage .summary-card {
+    border-color: #e7e8e2;
+    box-shadow:
+      0 12px 30px rgba(48, 58, 72, .08),
+      0 2px 6px rgba(48, 58, 72, .035);
+  }
+
+  @media (max-width: 520px) {
+    #calculatorPage .cash-section {
+      padding: 9px 10px 10px;
+    }
+
+    #calculatorPage .cash-composer {
+      grid-template-columns: minmax(0, 41%) minmax(0, 59%);
+      gap: 8px;
+    }
+
+    #calculatorPage .cash-info-panel > .field-label {
+      padding: 8px 11px 1px;
+      font-size: 14px;
+      border-radius: 15px 15px 0 0;
+    }
+
+    #calculatorPage .cash-display-wrap {
+      min-height: 58px;
+      border-radius: 0 0 15px 15px;
+    }
+
+    #calculatorPage .money-input.keypad-display {
+      height: 57px;
+      padding-left: 48px;
+      padding-right: 9px;
+      font-size: 30px;
+    }
+
+    #calculatorPage .cash-display-wrap .money-prefix {
+      left: 10px;
+      font-size: 18px;
+    }
+
+    #calculatorPage .change-box {
+      min-height: 56px;
+      margin-top: 7px;
+      padding: 8px 10px;
+      border-radius: 13px;
+    }
+
+    #calculatorPage .change-box strong {
+      font-size: 16px;
+    }
+
+    #calculatorPage .change-amount {
+      font-size: 26px;
+    }
+
+    #calculatorPage .cash-keypad {
+      gap: 5px;
+    }
+
+    #calculatorPage .cash-key {
+      min-height: 49px;
+      border-radius: 11px;
+      font-size: 24px;
+    }
+
+    #calculatorPage .cash-key.utility {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 390px), (max-height: 720px) {
+    #calculatorPage .cash-composer {
+      grid-template-columns: minmax(0, 40%) minmax(0, 60%);
+      gap: 6px;
+    }
+
+    #calculatorPage .cash-info-panel > .field-label {
+      padding-top: 7px;
+    }
+
+    #calculatorPage .cash-display-wrap {
+      min-height: 54px;
+    }
+
+    #calculatorPage .money-input.keypad-display {
+      height: 53px;
+      padding-left: 45px;
+      font-size: 27px;
+    }
+
+    #calculatorPage .cash-display-wrap .money-prefix {
+      font-size: 17px;
+    }
+
+    #calculatorPage .change-box {
+      min-height: 51px;
+      margin-top: 6px;
+    }
+
+    #calculatorPage .change-amount {
+      font-size: 23px;
+    }
+
+    #calculatorPage .cash-key {
+      min-height: 46px;
+      font-size: 22px;
+    }
+  }
+</style>
+
+
+<style>
+  /* 2026-08-11：收現改成與找零同列，同一格顯示 */
+  #calculatorPage .cash-info-panel > .field-label {
+    display: none;
+  }
+
+  #calculatorPage .cash-display-wrap {
+    position: relative;
+    min-height: 62px;
+    margin: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding: 0 14px;
+    border: 1px solid rgba(218, 214, 196, .95);
+    border-radius: 15px;
+    background: rgba(255,255,255,.78);
+    box-shadow:
+      0 5px 14px rgba(83, 76, 50, .045),
+      inset 0 1px 0 rgba(255,255,255,.92);
+  }
+
+  #calculatorPage .cash-display-wrap::before {
+    content: '收現';
+    color: #626a73;
+    font-size: 17px;
+    font-weight: 900;
+    white-space: nowrap;
+  }
+
+  #calculatorPage .cash-display-wrap .money-prefix {
+    display: none;
+  }
+
+  #calculatorPage .money-input.keypad-display {
+    height: 60px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    text-align: right;
+    color: #549688;
+    font-size: 31px;
+    font-weight: 950;
+    letter-spacing: .01em;
+  }
+
+  #calculatorPage .money-input.keypad-display:focus {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  #calculatorPage .money-input.keypad-display::placeholder {
+    color: #b7b9b0;
+    opacity: 1;
+  }
+
+  @media (max-width: 520px) {
+    #calculatorPage .cash-display-wrap {
+      min-height: 58px;
+      gap: 10px;
+      padding: 0 11px;
+      border-radius: 13px;
+    }
+
+    #calculatorPage .cash-display-wrap::before {
+      font-size: 16px;
+    }
+
+    #calculatorPage .money-input.keypad-display {
+      height: 56px;
+      font-size: 28px;
+    }
+  }
+
+  @media (max-width: 390px), (max-height: 720px) {
+    #calculatorPage .cash-display-wrap {
+      min-height: 54px;
+      gap: 8px;
+      padding: 0 10px;
+    }
+
+    #calculatorPage .cash-display-wrap::before {
+      font-size: 15px;
+    }
+
+    #calculatorPage .money-input.keypad-display {
+      height: 52px;
+      font-size: 25px;
+    }
+  }
+</style>
+
+
+<style>
+  /* 2026-08-11：收現/找零同級大字，移除陰影 */
+  #calculatorPage .cash-display-wrap,
+  #calculatorPage .change-box {
+    box-shadow: none !important;
+  }
+
+  #calculatorPage .money-input.keypad-display {
+    font-size: 31px !important;
+  }
+
+  #calculatorPage .change-amount {
+    font-size: 31px !important;
+  }
+
+  @media (max-width: 520px) {
+    #calculatorPage .money-input.keypad-display {
+      font-size: 28px !important;
+    }
+
+    #calculatorPage .change-amount {
+      font-size: 28px !important;
+    }
+  }
+
+  @media (max-width: 390px), (max-height: 720px) {
+    #calculatorPage .money-input.keypad-display {
+      font-size: 25px !important;
+    }
+
+    #calculatorPage .change-amount {
+      font-size: 25px !important;
+    }
+  }
+</style>
+
+
+<style>
+  /* 2026-08-11：淺黃色區塊取消陰影，並降低總金額/找零混淆 */
+
+  /* 淺黃色區塊改成乾淨平面，不要陰影 */
+  #calculatorPage .cash-section {
+    background: #FFFCEB !important;
+    box-shadow: none !important;
+    background-image: none !important;
+    border-top: 1px solid #eee3ac;
+  }
+
+  /* 整個摘要卡保留簡單卡片感，但不讓黃色區看起來浮起來 */
+  #calculatorPage .summary-card {
+    overflow: hidden;
+  }
+
+  /* 上方總額區做出資訊層級：改成「應收總額」且顏色和找零分開 */
+  #calculatorPage .summary-top {
+    background: #fffef8;
+  }
+
+  #calculatorPage .summary-top .metric:last-child {
+    background: #fffaf0;
+  }
+
+  #calculatorPage .summary-top .metric-label {
+    letter-spacing: .02em;
+  }
+
+  #calculatorPage #totalAmount {
+    color: #8A6A2F !important;
+    font-size: 30px;
+  }
+
+  /* 收現與找零同區，但找零保留較明確的名稱 */
+  #calculatorPage .cash-display-wrap::before,
+  #calculatorPage .change-box strong {
+    color: #626a73;
+    font-weight: 900;
+  }
+
+  /* 收現金額與找零金額同級大字 */
+  #calculatorPage .money-input.keypad-display,
+  #calculatorPage .change-amount {
+    font-size: 31px !important;
+  }
+
+  /* 找零採獨立色彩邏輯，避免和應收總額撞色 */
+  #calculatorPage .change-box {
+    border: 1px solid #e5dcc0;
+    background: rgba(255,255,255,.76);
+  }
+
+  #calculatorPage .change-box.positive {
+    background: #eef8f3;
+    border-color: #d4e9de;
+  }
+
+  #calculatorPage .change-box.positive .change-amount {
+    color: #549688 !important;
+  }
+
+  #calculatorPage .change-box.negative {
+    background: #fff1f1;
+    border-color: #efd0d0;
+  }
+
+  #calculatorPage .change-box.negative .change-amount {
+    color: #CD5C5C !important;
+  }
+
+  /* 收現金額維持你要的綠色 */
+  #calculatorPage .money-input.keypad-display {
+    color: #549688 !important;
+  }
+
+  @media (max-width: 520px) {
+    #calculatorPage #totalAmount {
+      font-size: 27px;
+    }
+
+    #calculatorPage .money-input.keypad-display,
+    #calculatorPage .change-amount {
+      font-size: 28px !important;
+    }
+  }
+
+  @media (max-width: 390px), (max-height: 720px) {
+    #calculatorPage #totalAmount {
+      font-size: 25px;
+    }
+
+    #calculatorPage .money-input.keypad-display,
+    #calculatorPage .change-amount {
+      font-size: 25px !important;
+    }
+  }
+</style>
+
+
+<style>
+  /* 2026-08-11：找零金額固定維持紅色 */
+  #calculatorPage .change-amount,
+  #calculatorPage .change-box.positive .change-amount,
+  #calculatorPage .change-box.negative .change-amount {
+    color: #CD5C5C !important;
+  }
+</style>
+
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <nav class="tabs" aria-label="頁面切換">
+        <button class="tab-btn active" data-page="calculator">計票</button>
+        <button class="tab-btn" data-page="records">銷售紀錄</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="calculatorPage" class="page active">
+        <div class="hero">
+          <div class="hero-title">
+            <div class="hero-badge" aria-hidden="true">🎟</div>
+            <div>
+              <h1>票價計算器</h1>
+              <p class="subtitle">選擇票數後輸入收現金額</p>
+            </div>
+          </div>
+          <button id="openSettingsBtn" class="icon-btn" type="button" aria-label="票種設定" title="票種設定">⚙️</button>
+        </div>
+
+        <div id="ticketList" class="ticket-list"></div>
+
+        <section class="card summary-card" aria-label="結帳摘要">
+          <div class="summary-top">
+            <div class="metric">
+              <div class="metric-label">總數</div>
+              <div id="totalPeople" class="metric-value">0</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">應收總額</div>
+              <div id="totalAmount" class="metric-value">NT$ 0</div>
+            </div>
+          </div>
+          <div class="cash-section">
+            <div class="cash-composer">
+              <div class="cash-info-panel">
+                <label class="field-label" for="cashInput">收現</label>
+                <div class="money-input-wrap cash-display-wrap">
+                  <span class="money-prefix">NT$</span>
+                  <input id="cashInput" class="money-input keypad-display" type="text" inputmode="none" readonly placeholder="NT$ 0" aria-label="收現金額" />
+                </div>
+                <div id="changeBox" class="change-box">
+                  <span><strong>找零金額</strong></span>
+                  <span id="changeAmount" class="change-amount">NT$ 0</span>
+                </div>
+              </div>
+              <div id="cashKeypad" class="cash-keypad" aria-label="收現金額數字鍵盤">
+                <button class="cash-key" type="button" data-cash-key="1">1</button>
+                <button class="cash-key" type="button" data-cash-key="2">2</button>
+                <button class="cash-key" type="button" data-cash-key="3">3</button>
+                <button class="cash-key" type="button" data-cash-key="4">4</button>
+                <button class="cash-key" type="button" data-cash-key="5">5</button>
+                <button class="cash-key" type="button" data-cash-key="6">6</button>
+                <button class="cash-key" type="button" data-cash-key="7">7</button>
+                <button class="cash-key" type="button" data-cash-key="8">8</button>
+                <button class="cash-key" type="button" data-cash-key="9">9</button>
+                <button class="cash-key utility" type="button" data-cash-action="clear">清除</button>
+                <button class="cash-key" type="button" data-cash-key="0">0</button>
+                <button class="cash-key utility backspace" type="button" data-cash-action="backspace" aria-label="刪除最後一位">←</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div class="action-row">
+          <button id="clearBtn" class="btn secondary" type="button">清除本次</button>
+          <button id="checkoutBtn" class="btn primary" type="button" disabled>結帳並記錄</button>
+        </div>
+      </section>
+
+      <section id="recordsPage" class="page">
+        <div class="hero">
+          <div class="hero-title">
+            <div class="hero-badge" aria-hidden="true">📒</div>
+            <div>
+              <h1>銷售紀錄</h1>
+              <p class="subtitle">依結帳日期統計票數與總金額</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="record-toolbar">
+          <button id="exportCsvBtn" class="btn outline" type="button">匯出 CSV</button>
+        </div>
+
+        <section id="latestOrderCard" class="card latest-card"></section>
+
+        <section id="todaySummaryCard" class="card latest-card"></section>
+
+        <div class="section-title-row">
+          <h2>日期紀錄</h2>
+        </div>
+        <div class="date-filter">
+          <input id="dateFilter" class="date-input" type="date" aria-label="篩選日期" />
+          <button id="clearDateFilterBtn" class="btn outline" type="button" style="min-height:44px;padding:8px 12px">全部日期</button>
+        </div>
+        <div id="dailyGroups" class="daily-groups"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="settingsModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="settingsTitle">票種設定</h2>
+        <button id="closeSettingsBtn" class="icon-btn" type="button" aria-label="關閉">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-text">可修改票種名稱與票價。已完成的歷史訂單不會因票價設定變更而改動。</p>
+        <div id="settingsList" class="settings-list"></div>
+        <div class="settings-actions">
+          <button id="addTicketTypeBtn" class="btn outline" type="button">＋ 新增票種</button>
+          <button id="saveSettingsBtn" class="btn primary" type="button">儲存設定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const KEYS = {
+        ticketTypes: 'ticketCounter.ticketTypes.v3',
+        orders: 'ticketCounter.orders.v2',
+        draft: 'ticketCounter.currentDraft.v3'
+      };
+
+      // 第一次開啟時的預設票種，可由右上角齒輪直接修改。
+      const DEFAULT_TICKET_TYPES = [
+        { id: 'adult', name: '全票', price: 299 },
+        { id: 'concession', name: '優待票', price: 249 },
+        { id: 'child', name: '博幼票', price: 149 },
+        { id: 'parking', name: '車票', price: 50 }
+      ];
+
+      const $ = (selector) => document.querySelector(selector);
+      const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+      const state = {
+        ticketTypes: loadJSON(KEYS.ticketTypes, DEFAULT_TICKET_TYPES),
+        quantities: {},
+        cash: '',
+        orders: loadJSON(KEYS.orders, []),
+        settingsDraft: []
+      };
+
+      function loadJSON(key, fallback) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return structuredCloneSafe(fallback);
+          return JSON.parse(raw);
+        } catch (error) {
+          console.warn('讀取資料失敗：', key, error);
+          return structuredCloneSafe(fallback);
+        }
+      }
+
+      function structuredCloneSafe(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+
+      function saveJSON(key, value) {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
+
+      function sanitizeState() {
+        if (!Array.isArray(state.ticketTypes) || state.ticketTypes.length === 0) {
+          state.ticketTypes = structuredCloneSafe(DEFAULT_TICKET_TYPES);
+        }
+        state.ticketTypes = state.ticketTypes
+          .filter(t => t && typeof t.name === 'string')
+          .map((t, index) => ({
+            id: String(t.id || `ticket-${Date.now()}-${index}`),
+            name: t.name.trim() || `票種 ${index + 1}`,
+            price: Math.max(0, Math.round(Number(t.price) || 0))
+          }));
+        if (!Array.isArray(state.orders)) state.orders = [];
+        let migrated = false;
+        state.orders = state.orders.map((order, index) => {
+          const copy = { ...(order || {}) };
+          if (!copy.createdAt) {
+            copy.createdAt = new Date(Date.now() - index * 1000).toISOString();
+            migrated = true;
+          }
+          if (!copy.id || String(copy.id) === 'undefined' || String(copy.id) === 'null') {
+            const stamp = new Date(copy.createdAt).getTime() || Date.now() - index;
+            copy.id = `LEGACY-${stamp}-${index}`;
+            migrated = true;
+          }
+          if (!copy.orderNo) {
+            copy.orderNo = `歷史訂單-${index + 1}`;
+            migrated = true;
+          }
+          return copy;
+        });
+        state.orders.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        if (migrated) saveJSON(KEYS.orders, state.orders);
+      }
+
+      function looksLikeLegacyDefaultTicketTypes(list) {
+        if (!Array.isArray(list) || list.length !== 3) return false;
+        const normalized = list.map(item => `${String(item?.name || '').trim()}-${Math.round(Number(item?.price) || 0)}`).sort();
+        return JSON.stringify(normalized) === JSON.stringify(['優待票-50', '全票-100', '免費票-0'].sort());
+      }
+
+      function applyTicketTypeMigrationIfNeeded() {
+        if (looksLikeLegacyDefaultTicketTypes(state.ticketTypes)) {
+          state.ticketTypes = structuredCloneSafe(DEFAULT_TICKET_TYPES);
+          saveJSON(KEYS.ticketTypes, state.ticketTypes);
+        }
+      }
+
+      function loadDraft() {
+        const draft = loadJSON(KEYS.draft, null);
+        if (!draft) return;
+        state.cash = draft.cash ?? '';
+        const quantities = draft.quantities || {};
+        for (const ticket of state.ticketTypes) {
+          state.quantities[ticket.id] = Math.max(0, Math.floor(Number(quantities[ticket.id]) || 0));
+        }
+      }
+
+      function saveDraft() {
+        saveJSON(KEYS.draft, { quantities: state.quantities, cash: state.cash });
+      }
+
+      function resetQuantities(keepExisting = false) {
+        const next = {};
+        state.ticketTypes.forEach(ticket => {
+          next[ticket.id] = keepExisting ? Math.max(0, Number(state.quantities[ticket.id]) || 0) : 0;
+        });
+        state.quantities = next;
+      }
+
+      function money(value) {
+        return `NT$ ${Math.round(Number(value) || 0).toLocaleString('zh-TW')}`;
+      }
+
+      function localDateKey(isoString) {
+        const date = new Date(isoString);
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        return `${y}-${m}-${d}`;
+      }
+
+      function formatDate(dateKey) {
+        const [y, m, d] = dateKey.split('-').map(Number);
+        return new Intl.DateTimeFormat('zh-TW', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'short' })
+          .format(new Date(y, m - 1, d));
+      }
+
+      function formatDateTime(isoString) {
+        return new Intl.DateTimeFormat('zh-TW', {
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+        }).format(new Date(isoString));
+      }
+
+      function formatTime(isoString) {
+        return new Intl.DateTimeFormat('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })
+          .format(new Date(isoString));
+      }
+
+      function escapeHTML(text) {
+        return String(text)
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#039;');
+      }
+
+      function currentTotals() {
+        let people = 0;
+        let amount = 0;
+        const items = [];
+        for (const ticket of state.ticketTypes) {
+          const qty = Math.max(0, Number(state.quantities[ticket.id]) || 0);
+          if (qty > 0) {
+            items.push({ id: ticket.id, name: ticket.name, price: ticket.price, qty, subtotal: ticket.price * qty });
+          }
+          people += qty;
+          amount += ticket.price * qty;
+        }
+        const cash = state.cash === ''
+          ? (people > 0 && amount === 0 ? 0 : null)
+          : Math.max(0, Number(state.cash) || 0);
+        const change = cash === null ? 0 : cash - amount;
+        return { people, amount, items, cash, change };
+      }
+
+      function renderTicketList() {
+        const container = $('#ticketList');
+        container.innerHTML = state.ticketTypes.map(ticket => {
+          const qty = state.quantities[ticket.id] || 0;
+          const subtotal = qty * ticket.price;
+          return `
+            <article class="card ticket-row" data-ticket-id="${escapeHTML(ticket.id)}" data-ticket-price="${ticket.price}">
+              <div class="ticket-main">
+                <div class="ticket-name">${escapeHTML(ticket.name)} <span class="ticket-inline-price">(${ticket.price}元)</span></div>
+              </div>
+              <div class="ticket-right">
+                <div class="stepper" aria-label="${escapeHTML(ticket.name)}數量">
+                  <button type="button" data-action="decrease" aria-label="減少一張">−</button>
+                  <div class="count" data-count>${qty}</div>
+                  <button type="button" data-action="increase" aria-label="增加一張">＋</button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+      }
+
+      function updateCalculatorSummary() {
+        const totals = currentTotals();
+        $('#totalPeople').textContent = totals.people.toLocaleString('zh-TW');
+        $('#totalAmount').textContent = money(totals.amount);
+        $('#cashInput').value = state.cash === '' ? '' : money(state.cash);
+        $('#changeAmount').textContent = money(totals.change);
+
+        const changeBox = $('#changeBox');
+        changeBox.classList.toggle('positive', totals.cash !== null && totals.change >= 0 && totals.people > 0);
+        changeBox.classList.toggle('negative', totals.cash !== null && totals.change < 0 && totals.people > 0);
+        changeBox.querySelector('strong').textContent = totals.cash !== null && totals.change < 0 ? '尚差金額' : '找零金額';
+        $('#changeAmount').textContent = money(Math.abs(totals.change));
+
+        $('#checkoutBtn').disabled = !(totals.people > 0 && totals.cash !== null && totals.cash >= totals.amount);
+        saveDraft();
+      }
+
+      function renderCalculator() {
+        renderTicketList();
+        updateCalculatorSummary();
+      }
+
+      function clearCurrentSale(showMessage = true) {
+        resetQuantities(false);
+        state.cash = '';
+        renderCalculator();
+        if (showMessage) showToast('已清除目前票數');
+      }
+
+      function checkout() {
+        const totals = currentTotals();
+        if (totals.people <= 0) {
+          showToast('請先選擇票數');
+          return;
+        }
+        if (totals.cash === null) {
+          showToast('請輸入收現金額');
+          return;
+        }
+        if (totals.cash < totals.amount) {
+          showToast(`收現金額不足，尚差 ${money(totals.amount - totals.cash)}`);
+          return;
+        }
+
+        const now = new Date();
+        const order = {
+          id: `ORD-${now.getTime()}-${Math.random().toString(36).slice(2, 7)}`,
+          orderNo: makeOrderNumber(now),
+          createdAt: now.toISOString(),
+          items: totals.items,
+          totalTickets: totals.people,
+          totalAmount: totals.amount,
+          cashReceived: totals.cash,
+          change: totals.change
+        };
+        state.orders.unshift(order);
+        saveJSON(KEYS.orders, state.orders);
+        clearCurrentSale(false);
+        renderRecords();
+        showToast(`結帳完成：${money(order.totalAmount)}`);
+      }
+
+      function makeOrderNumber(date) {
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const hh = String(date.getHours()).padStart(2, '0');
+        const mm = String(date.getMinutes()).padStart(2, '0');
+        const ss = String(date.getSeconds()).padStart(2, '0');
+        return `${y}${m}${d}-${hh}${mm}${ss}`;
+      }
+
+      function normalizeOrder(order, fallbackIndex = 0) {
+        const items = Array.isArray(order.items) ? order.items : [];
+        const createdAt = order.createdAt || new Date(Date.now() - fallbackIndex * 1000).toISOString();
+        const id = order.id && String(order.id) !== 'undefined' && String(order.id) !== 'null'
+          ? String(order.id)
+          : `LEGACY-${new Date(createdAt).getTime() || Date.now()}-${fallbackIndex}`;
+        return {
+          ...order,
+          id,
+          createdAt,
+          orderNo: order.orderNo || `歷史訂單-${fallbackIndex + 1}`,
+          items,
+          totalTickets: Number(order.totalTickets) || items.reduce((s, x) => s + (Number(x.qty) || 0), 0),
+          totalAmount: Number(order.totalAmount) || items.reduce((s, x) => s + (Number(x.subtotal) || 0), 0),
+          cashReceived: Number(order.cashReceived) || 0,
+          change: Number(order.change) || 0
+        };
+      }
+
+      function latestOrderHTML() {
+        const order = state.orders[0] ? normalizeOrder(state.orders[0]) : null;
+        if (!order) {
+          return `<div class="empty-state"><div class="empty-icon">🧾</div><strong>尚無結帳紀錄</strong><div style="margin-top:5px">按下「結帳並記錄」後，最後一筆訂單會顯示在這裡。</div></div>`;
+        }
+        const lines = order.items.map(item => `
+          <div class="item-line"><span>${escapeHTML(item.name)} × ${Number(item.qty).toLocaleString('zh-TW')}</span><strong>${money(item.subtotal)}</strong></div>
+        `).join('');
+        return `
+          <div class="section-title-row">
+            <div><span class="pill">最後一筆訂單</span></div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="order-time">${formatDateTime(order.createdAt)}</span>
+              <button class="mini-btn" type="button" data-delete-latest="${escapeHTML(order.id)}">刪除此筆</button>
+            </div>
+          </div>
+          <h3>訂單 ${escapeHTML(order.orderNo || order.id)}</h3>
+          <div class="item-lines">${lines}</div>
+          <div class="total-line"><span>${order.totalTickets} 張票</span><span>${money(order.totalAmount)}</span></div>
+          <div class="item-lines" style="margin-top:10px">
+            <div class="item-line"><span>收現</span><strong>${money(order.cashReceived)}</strong></div>
+            <div class="item-line"><span>找零</span><strong>${money(order.change)}</strong></div>
+          </div>
+        `;
+      }
+
+      function groupOrdersByDate() {
+        const groups = new Map();
+        for (const [orderIndex, raw] of state.orders.entries()) {
+          const order = normalizeOrder(raw, orderIndex);
+          const key = localDateKey(order.createdAt);
+          if (!groups.has(key)) {
+            groups.set(key, { dateKey: key, orders: [], totalTickets: 0, totalAmount: 0, ticketTotals: new Map() });
+          }
+          const group = groups.get(key);
+          group.orders.push(order);
+          group.totalTickets += order.totalTickets;
+          group.totalAmount += order.totalAmount;
+          for (const item of order.items) {
+            const identity = `${item.name}@@${item.price}`;
+            if (!group.ticketTotals.has(identity)) group.ticketTotals.set(identity, { name: item.name, price: item.price, qty: 0, subtotal: 0 });
+            const ticketTotal = group.ticketTotals.get(identity);
+            ticketTotal.qty += Number(item.qty) || 0;
+            ticketTotal.subtotal += Number(item.subtotal) || 0;
+          }
+        }
+        return [...groups.values()].sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+      }
+
+      function orderedTicketSummary(group) {
+        const values = [...group.ticketTotals.values()];
+        const used = new Set();
+        const result = [];
+
+        for (const type of state.ticketTypes) {
+          const matchIndex = values.findIndex((item, index) => !used.has(index) && item.name === type.name && Number(item.price) === Number(type.price));
+          if (matchIndex >= 0) {
+            used.add(matchIndex);
+            result.push(values[matchIndex]);
+          } else {
+            result.push({ name: type.name, price: type.price, qty: 0, subtotal: 0 });
+          }
+        }
+        values.forEach((item, index) => { if (!used.has(index)) result.push(item); });
+        return result;
+      }
+
+      function ticketSummaryGridHTML(group) {
+        return `<div class="ticket-summary-grid">${orderedTicketSummary(group).map(item => `
+          <div class="ticket-summary-item">
+            <div class="ticket-summary-name">${escapeHTML(item.name)}</div>
+            <div class="ticket-summary-qty">${Number(item.qty).toLocaleString('zh-TW')} 張</div>
+            <div class="ticket-summary-money">${money(item.subtotal)}</div>
+          </div>
+        `).join('')}</div>`;
+      }
+
+      function dailyCardHTML(group) {
+        const ticketSummary = ticketSummaryGridHTML(group);
+
+        const orders = group.orders.map((order, index) => {
+          const itemText = order.items.map(i => `${escapeHTML(i.name)} ${i.qty} 張`).join('、');
+          return `
+            <article class="order-entry">
+              <div class="order-entry-head">
+                <div>
+                  <div class="order-no">${formatTime(order.createdAt)}｜${money(order.totalAmount)}</div>
+                  <div class="order-time">${order.totalTickets} 張｜收現 ${money(order.cashReceived)}｜找零 ${money(order.change)}</div>
+                </div>
+                <div class="order-actions">
+                  <button class="mini-btn" type="button" data-delete-order="${escapeHTML(order.id)}">刪除此筆</button>
+                </div>
+              </div>
+              <div class="order-items">${itemText || '無票種明細'}</div>
+            </article>
+          `;
+        }).join('');
+
+        return `
+          <section class="card daily-card" data-date="${group.dateKey}">
+            <div class="daily-head" data-expand-date="${group.dateKey}">
+              <div class="daily-title">${formatDate(group.dateKey)} <span class="expand-mark">⌄</span></div>
+              <div class="daily-meta">點此展開 ${group.orders.length} 筆訂單，可逐筆刪除</div>
+            </div>
+            <div class="daily-stats">
+              <div class="small-metric"><div class="small-label">訂單數</div><div class="small-value">${group.orders.length} 筆</div></div>
+              <div class="small-metric"><div class="small-label">總票數</div><div class="small-value">${group.totalTickets} 張</div></div>
+              <div class="small-metric"><div class="small-label">總金額</div><div class="small-value">${money(group.totalAmount)}</div></div>
+            </div>
+            <div class="daily-ticket-summary">${ticketSummary}</div>
+            <div class="orders-wrap">${orders}</div>
+          </section>
+        `;
+      }
+
+      function todaySummaryHTML() {
+        const todayKey = localDateKey(new Date().toISOString());
+        const today = groupOrdersByDate().find(group => group.dateKey === todayKey);
+        if (!today) {
+          return `<div class="section-title-row"><h2>今日累計</h2><span class="pill">${formatDate(todayKey)}</span></div><div class="empty-state" style="padding:20px 10px"><strong>今天尚無結帳紀錄</strong></div>`;
+        }
+        const ticketLines = ticketSummaryGridHTML(today);
+        return `
+          <div class="section-title-row"><h2>今日累計</h2><span class="pill">${formatDate(todayKey)}</span></div>
+          <div class="daily-stats" style="margin:0 -17px">
+            <div class="small-metric"><div class="small-label">訂單數</div><div class="small-value">${today.orders.length} 筆</div></div>
+            <div class="small-metric"><div class="small-label">總票數</div><div class="small-value">${today.totalTickets} 張</div></div>
+            <div class="small-metric"><div class="small-label">總金額</div><div class="small-value">${money(today.totalAmount)}</div></div>
+          </div>
+          <div class="daily-ticket-summary" style="padding:14px 0 0">${ticketLines}</div>
+        `;
+      }
+
+      function renderRecords() {
+        $('#latestOrderCard').innerHTML = latestOrderHTML();
+        $('#todaySummaryCard').innerHTML = todaySummaryHTML();
+        const filter = $('#dateFilter').value;
+        const groups = groupOrdersByDate().filter(group => !filter || group.dateKey === filter);
+        $('#dailyGroups').innerHTML = groups.length
+          ? groups.map(dailyCardHTML).join('')
+          : `<div class="card empty-state"><div class="empty-icon">📅</div><strong>${filter ? '此日期沒有紀錄' : '目前沒有銷售紀錄'}</strong></div>`;
+      }
+
+      function deleteOrder(orderId) {
+        const targetId = String(orderId || '');
+        const orderIndex = state.orders.findIndex((x, index) => normalizeOrder(x, index).id === targetId);
+        if (orderIndex < 0) {
+          showToast('找不到這筆歷史訂單，請重新整理後再試');
+          return;
+        }
+        const order = normalizeOrder(state.orders[orderIndex], orderIndex);
+        if (!confirm(`確定刪除 ${formatDateTime(order.createdAt)} 的這筆訂單嗎？`)) return;
+        state.orders.splice(orderIndex, 1);
+        saveJSON(KEYS.orders, state.orders);
+        renderRecords();
+        showToast('已刪除訂單');
+      }
+
+      function clearAllRecords() {
+        if (!state.orders.length) {
+          showToast('目前沒有紀錄');
+          return;
+        }
+        if (!confirm('確定清除全部銷售紀錄嗎？此動作無法復原。')) return;
+        state.orders = [];
+        saveJSON(KEYS.orders, state.orders);
+        renderRecords();
+        showToast('已清除全部紀錄');
+      }
+
+      function exportCSV() {
+        if (!state.orders.length) {
+          showToast('目前沒有可匯出的紀錄');
+          return;
+        }
+        const headers = ['日期', '結帳時間', '訂單編號', '票種', '單價', '張數', '小計', '訂單總票數', '訂單總金額', '收現', '找零'];
+        const rows = [headers];
+        for (const raw of [...state.orders].reverse()) {
+          const order = normalizeOrder(raw);
+          const dateKey = localDateKey(order.createdAt);
+          for (const item of order.items) {
+            rows.push([
+              dateKey,
+              formatTime(order.createdAt),
+              order.orderNo || order.id,
+              item.name,
+              item.price,
+              item.qty,
+              item.subtotal,
+              order.totalTickets,
+              order.totalAmount,
+              order.cashReceived,
+              order.change
+            ]);
+          }
+        }
+        const csv = rows.map(row => row.map(csvCell).join(',')).join('\r\n');
+        downloadBlob(`銷售紀錄_${localDateKey(new Date().toISOString())}.csv`, '\uFEFF' + csv, 'text/csv;charset=utf-8');
+        showToast('CSV 已匯出');
+      }
+
+      function csvCell(value) {
+        const text = String(value ?? '');
+        return `"${text.replaceAll('"', '""')}"`;
+      }
+
+      function downloadBlob(filename, content, type) {
+        const blob = new Blob([content], { type });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function openSettings() {
+        state.settingsDraft = structuredCloneSafe(state.ticketTypes);
+        renderSettingsList();
+        $('#settingsModal').classList.add('open');
+      }
+
+      function closeSettings() {
+        $('#settingsModal').classList.remove('open');
+      }
+
+      function renderSettingsList() {
+        $('#settingsList').innerHTML = state.settingsDraft.map((ticket, index) => `
+          <div class="settings-row" data-setting-index="${index}">
+            <input class="text-input" data-field="name" value="${escapeHTML(ticket.name)}" maxlength="30" aria-label="票種名稱" />
+            <input class="text-input" data-field="price" type="number" min="0" step="1" value="${ticket.price}" inputmode="numeric" aria-label="票價" />
+            <button class="remove-type" type="button" data-remove-index="${index}" aria-label="刪除票種">✕</button>
+          </div>
+        `).join('');
+      }
+
+      function syncSettingsDraftFromInputs() {
+        $$('#settingsList .settings-row').forEach(row => {
+          const index = Number(row.dataset.settingIndex);
+          if (!state.settingsDraft[index]) return;
+          state.settingsDraft[index].name = row.querySelector('[data-field="name"]').value;
+          state.settingsDraft[index].price = row.querySelector('[data-field="price"]').value;
+        });
+      }
+
+      function addTicketType() {
+        syncSettingsDraftFromInputs();
+        state.settingsDraft.push({ id: `ticket-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`, name: '新票種', price: 0 });
+        renderSettingsList();
+      }
+
+      function removeTicketType(index) {
+        syncSettingsDraftFromInputs();
+        if (state.settingsDraft.length <= 1) {
+          showToast('至少需要保留一個票種');
+          return;
+        }
+        state.settingsDraft.splice(index, 1);
+        renderSettingsList();
+      }
+
+      function saveSettings() {
+        syncSettingsDraftFromInputs();
+        const cleaned = state.settingsDraft.map((ticket, index) => ({
+          id: String(ticket.id || `ticket-${Date.now()}-${index}`),
+          name: String(ticket.name || '').trim(),
+          price: Math.max(0, Math.round(Number(ticket.price) || 0))
+        }));
+        if (cleaned.some(ticket => !ticket.name)) {
+          showToast('票種名稱不能留白');
+          return;
+        }
+        const names = cleaned.map(t => t.name);
+        if (new Set(names).size !== names.length) {
+          showToast('票種名稱不可重複');
+          return;
+        }
+        state.ticketTypes = cleaned;
+        saveJSON(KEYS.ticketTypes, state.ticketTypes);
+        resetQuantities(true);
+        closeSettings();
+        renderCalculator();
+        showToast('票種設定已儲存');
+      }
+
+      let toastTimer;
+      function showToast(message) {
+        const toast = $('#toast');
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+      }
+
+      function switchPage(pageName) {
+        $$('.tab-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.page === pageName));
+        $('#calculatorPage').classList.toggle('active', pageName === 'calculator');
+        $('#recordsPage').classList.toggle('active', pageName === 'records');
+        if (pageName === 'records') renderRecords();
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+
+      function bindEvents() {
+        $('.tabs').addEventListener('click', event => {
+          const button = event.target.closest('[data-page]');
+          if (button) switchPage(button.dataset.page);
+        });
+
+        $('#ticketList').addEventListener('click', event => {
+          const actionBtn = event.target.closest('[data-action]');
+          if (!actionBtn) return;
+          const row = actionBtn.closest('[data-ticket-id]');
+          const id = row.dataset.ticketId;
+          const current = Math.max(0, Number(state.quantities[id]) || 0);
+          state.quantities[id] = actionBtn.dataset.action === 'increase' ? current + 1 : Math.max(0, current - 1);
+          row.querySelector('[data-count]').textContent = state.quantities[id];
+          updateCalculatorSummary();
+        });
+
+        $('#cashKeypad').addEventListener('click', event => {
+          const keyButton = event.target.closest('[data-cash-key]');
+          const actionButton = event.target.closest('[data-cash-action]');
+
+          if (keyButton) {
+            const digit = keyButton.dataset.cashKey;
+            const current = state.cash === '' ? '' : String(state.cash);
+            const next = (current + digit).replace(/^0+(?=\d)/, '');
+            state.cash = Math.min(9999999, Math.max(0, Number(next) || 0));
+            updateCalculatorSummary();
+            return;
+          }
+
+          if (actionButton) {
+            if (actionButton.dataset.cashAction === 'clear') {
+              state.cash = '';
+            } else if (actionButton.dataset.cashAction === 'backspace') {
+              const current = state.cash === '' ? '' : String(state.cash);
+              const next = current.slice(0, -1);
+              state.cash = next === '' ? '' : Number(next);
+            }
+            updateCalculatorSummary();
+          }
+        });
+
+        $('#clearBtn').addEventListener('click', () => {
+          const totals = currentTotals();
+          if (totals.people > 0 || totals.cash !== null) {
+            if (!confirm('確定清除目前尚未結帳的內容嗎？')) return;
+          }
+          clearCurrentSale();
+        });
+        $('#checkoutBtn').addEventListener('click', checkout);
+
+        $('#openSettingsBtn').addEventListener('click', openSettings);
+        $('#closeSettingsBtn').addEventListener('click', closeSettings);
+        $('#settingsModal').addEventListener('click', event => {
+          if (event.target === $('#settingsModal')) closeSettings();
+        });
+        $('#addTicketTypeBtn').addEventListener('click', addTicketType);
+        $('#saveSettingsBtn').addEventListener('click', saveSettings);
+        $('#settingsList').addEventListener('click', event => {
+          const button = event.target.closest('[data-remove-index]');
+          if (button) removeTicketType(Number(button.dataset.removeIndex));
+        });
+
+        $('#latestOrderCard').addEventListener('click', event => {
+          const button = event.target.closest('[data-delete-latest]');
+          if (button) deleteOrder(button.dataset.deleteLatest);
+        });
+
+        $('#dailyGroups').addEventListener('click', event => {
+          const deleteBtn = event.target.closest('[data-delete-order]');
+          if (deleteBtn) {
+            event.stopPropagation();
+            deleteOrder(deleteBtn.dataset.deleteOrder);
+            return;
+          }
+          const head = event.target.closest('[data-expand-date]');
+          if (head) head.closest('.daily-card').classList.toggle('expanded');
+        });
+
+        $('#dateFilter').addEventListener('change', renderRecords);
+        $('#clearDateFilterBtn').addEventListener('click', () => {
+          $('#dateFilter').value = '';
+          renderRecords();
+        });
+        $('#exportCsvBtn').addEventListener('click', exportCSV);
+
+        document.addEventListener('keydown', event => {
+          if (event.key === 'Escape') closeSettings();
+        });
+      }
+
+      function init() {
+        sanitizeState();
+        applyTicketTypeMigrationIfNeeded();
+        sanitizeState();
+        resetQuantities(false);
+        loadDraft();
+        bindEvents();
+        renderCalculator();
+        renderRecords();
+      }
+
+      init();
+    })();
+  </script>
+</body>
+</html>
