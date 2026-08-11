@@ -183,12 +183,11 @@
     .summary-top { display: grid; grid-template-columns: 1fr 1fr; }
     .metric { padding: 10px 13px; }
     .metric + .metric { border-left: 1px solid var(--line); }
-    .metric-label { color: var(--muted); font-weight: 800; font-size: 16px; }
+    .metric-label { color: var(--muted); font-weight: 800; font-size: 14px; }
     .metric-value { margin-top: 2px; font-size: 23px; font-weight: 950; font-variant-numeric: tabular-nums; }
-    #totalAmount { font-size: 31px; color: #CD5C5C; font-weight: 950; }
 
     .cash-section { border-top: 1px solid var(--line); padding: 10px 13px; }
-    .field-label { display: block; color: #586176; font-size: 16px; font-weight: 850; margin-bottom: 8px; }
+    .field-label { display: block; color: #586176; font-size: 14px; font-weight: 850; margin-bottom: 8px; }
     .money-input-wrap { position: relative; }
     .money-prefix {
       position: absolute;
@@ -206,7 +205,7 @@
       outline: none;
       background: #fafbfe;
       color: var(--text);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 850;
       font-variant-numeric: tabular-nums;
     }
@@ -216,17 +215,15 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      margin-top: 8px;
-      padding: 13px 15px;
-      min-height: 62px;
+      margin-top: 7px;
+      padding: 8px 12px;
       border-radius: 16px;
       background: linear-gradient(180deg, #f4f6fb 0%, #edf1f7 100%);
       box-shadow: inset 0 1px 1px rgba(255,255,255,.9);
-      font-size: 19px;
     }
     .change-box.positive { background: var(--success-soft); color: #157c53; }
     .change-box.negative { background: var(--danger-soft); color: #ba3d3d; }
-    .change-amount { font-size: 31px; font-weight: 950; font-variant-numeric: tabular-nums; color: #CD5C5C; }
+    .change-amount { font-size: 20px; font-weight: 950; font-variant-numeric: tabular-nums; }
 
     .action-row { display: grid; grid-template-columns: .75fr 1.35fr; gap: 8px; margin-top: 8px; }
     .btn {
@@ -402,7 +399,7 @@
       #calculatorPage .hero-title { gap: 0; }
       #calculatorPage .stepper { grid-template-columns: 54px 44px 54px; }
       #calculatorPage .count { min-width: 44px; }
-      #calculatorPage .metric-label, #calculatorPage .field-label { font-size: 15px; }
+      #calculatorPage .metric-label, #calculatorPage .field-label { font-size: 12px; }
       #calculatorPage .ticket-inline-price { display: block; margin-top: 1px; }
     }
 
@@ -418,1021 +415,308 @@
       #calculatorPage .ticket-inline-price { font-size: 13px; }
       #calculatorPage .metric { padding: 9px 11px; }
       #calculatorPage .metric-value { font-size: 22px; }
-      #calculatorPage #totalAmount { font-size: 30px; }
-      #calculatorPage .change-amount { font-size: 30px; }
-      #calculatorPage .change-box { min-height: 60px; padding: 12px 13px; }
       #calculatorPage .cash-section { padding: 8px 11px; }
       #calculatorPage .money-input { height: 44px; }
-      #calculatorPage .change-box { margin-top: 7px; min-height: 60px; padding: 12px 13px; }
+      #calculatorPage .change-box { margin-top: 6px; padding: 7px 10px; }
       #calculatorPage .action-row { margin-top: 7px; }
       #calculatorPage .btn { min-height: 46px; }
     }
 
-    /* 2026-08-11：加大總數與票種文字 */
-    #totalPeople {
-      font-size: 31px;
+
+    /* ===== 2026-08-11 字級與結帳重點強化 ===== */
+    body { font-size: 19px; }
+
+    .tab-btn { font-size: 20px; padding: 13px 10px; }
+    h1 { font-size: clamp(29px, 5.8vw, 36px); }
+    #calculatorPage h1 { font-size: clamp(22px, 4.3vw, 27px); }
+    h2 { font-size: 26px; }
+    h3 { font-size: 22px; }
+    .subtitle { font-size: 16px; }
+
+    .ticket-name { font-size: 23px; }
+    .ticket-inline-price { font-size: 19px; }
+    .count { font-size: 38px; }
+    .stepper button { font-size: 35px; }
+
+    .metric-label,
+    .field-label { font-size: 20px; }
+    .metric-value { font-size: 34px; }
+
+    /* 總金額：紅褐色＋最大化 */
+    #totalAmount {
+      color: #a64b3c;
+      font-size: 42px;
+      line-height: 1.1;
       font-weight: 950;
     }
-    #calculatorPage .ticket-name {
-      font-size: 20px;
-      line-height: 1.25;
-    }
-    #calculatorPage .ticket-inline-price {
-      font-size: 16px;
-      font-weight: 900;
-    }
 
-    @media (max-width: 520px) {
-      #calculatorPage #totalPeople { font-size: 31px; }
-      #calculatorPage .ticket-name { font-size: 19px; }
-      #calculatorPage .ticket-inline-price { font-size: 16px; }
+    /* 收現：綠色，標籤與輸入數字都放大 */
+    #calculatorPage .field-label[for="cashInput"] {
+      color: #549688;
+      font-size: 22px;
+      font-weight: 950;
     }
-
-
-
-    /* 2026-08-11：手機快速收現數字鍵盤 */
-    .cash-display-wrap {
-      position: relative;
+    .money-prefix {
+      color: #505866;
+      font-size: 27px;
+      line-height: 1;
+      font-weight: 950;
     }
-    .money-input.keypad-display {
-      cursor: default;
-      caret-color: transparent;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .cash-keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-      margin-top: 7px;
-    }
-    .cash-key {
-      min-height: 48px;
+    .money-input {
+      width: 100%;
+      height: 64px;
       border: 1px solid #dce1eb;
-      border-radius: 13px;
-      background: linear-gradient(180deg, #ffffff 0%, #f5f7fb 100%);
-      color: #1d2433;
-      font-size: 24px;
+      border-radius: 14px;
+      padding: 0 14px 0 64px;
+      outline: none;
+      background: #fafbfe;
+      color: #549688;
+      font-size: 38px;
       font-weight: 950;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(42,55,86,.06);
+      font-variant-numeric: tabular-nums;
     }
-    .cash-key:active { transform: scale(.97); background: #edf1f7; }
-    .cash-key.utility {
-      color: #276c50;
-      background: linear-gradient(180deg, #eef8f3 0%, #e3f1ea 100%);
-      font-size: 18px;
+    .money-input:focus {
+      border-color: #549688;
+      box-shadow: 0 0 0 4px rgba(84,150,136,.14);
     }
-    .cash-key.backspace { font-size: 22px; }
+
+    /* 所有 $ 統一淺黑色；數字沿用各區塊本身的顏色 */
+    .currency-prefix {
+      color: #505866 !important;
+      font-size: .68em;
+      font-weight: 900;
+      vertical-align: .08em;
+    }
+    .money-number {
+      color: inherit;
+    }
+
+    /* 找零 / 尚差：一律紅色，數字與總金額同級 */
+    .change-box,
+    .change-box.positive,
+    .change-box.negative {
+      color: #d92e2e;
+    }
+    .change-box strong { font-size: 22px; }
+    .change-amount {
+      color: #d92e2e;
+      font-size: 42px;
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .btn { font-size: 20px; }
+    .record-toolbar .btn { font-size: 19px; min-height: 50px; }
+    .order-time, .daily-meta { font-size: 17px; }
+    .item-line, .order-items { font-size: 18px; }
+    .total-line { font-size: 22px; }
+    .daily-title { font-size: 23px; }
+    .small-label, .ticket-summary-name { font-size: 16px; }
+    .small-value, .ticket-summary-qty { font-size: 22px; }
+    .ticket-summary-money { font-size: 16px; }
+    .date-input { font-size: 19px; }
+    .text-input { font-size: 19px; }
+    .help-text { font-size: 17px; }
 
     @media (max-width: 520px) {
-      /* 計票頁以一個手機視窗完成操作：隱藏非必要標題，保留大按鍵 */
-      #calculatorPage .hero { display: none; }
-      main { padding-top: 8px; }
-      .ticket-list { gap: 6px; }
+      #calculatorPage h1 { font-size: 21px; }
+      #calculatorPage .ticket-name { font-size: 21px; }
+      #calculatorPage .ticket-inline-price { font-size: 17px; }
+      #calculatorPage .count { font-size: 35px; }
+      #calculatorPage .metric-label,
+      #calculatorPage .field-label { font-size: 19px; }
+      #calculatorPage .metric-value { font-size: 31px; }
+      #totalAmount { font-size: 38px; }
+      #calculatorPage .field-label[for="cashInput"] { font-size: 21px; }
+      #calculatorPage .money-input { height: 62px; font-size: 35px; padding-left: 60px; }
+      #calculatorPage .money-prefix { font-size: 25px; }
+      #calculatorPage .change-box strong { font-size: 21px; }
+      #calculatorPage .change-amount { font-size: 38px; }
+    }
+
+
+
+    /* ===== 手機清楚實用版：建立明確資訊層級 ===== */
+    .cash-entry-block { min-width: 0; }
+
+    @media (max-width: 520px) {
+      /* 頁面不要被過大的標題吃掉空間 */
+      #calculatorPage .hero {
+        margin: 0 2px 8px;
+        align-items: center;
+      }
+      #calculatorPage h1 {
+        font-size: 20px;
+        letter-spacing: -.02em;
+      }
+      #calculatorPage .subtitle {
+        font-size: 13px;
+        margin-top: 1px;
+      }
+
+      /* 票種：按鈕夠大，但資訊不互搶 */
+      #calculatorPage .ticket-list { gap: 8px; }
       #calculatorPage .ticket-row {
-        min-height: 57px;
-        padding: 5px 10px;
+        min-height: 72px;
+        padding: 9px 10px 9px 13px;
         border-radius: 18px;
       }
-      #calculatorPage .ticket-name { font-size: 18px; line-height: 1.12; }
-      #calculatorPage .ticket-inline-price { display: inline; margin: 0; font-size: 15px; }
-      #calculatorPage .stepper { grid-template-columns: 49px 40px 49px; gap: 4px; }
-      #calculatorPage .stepper button {
-        width: 49px;
-        height: 49px;
-        border-radius: 14px;
-        font-size: 29px;
+      #calculatorPage .ticket-name {
+        font-size: 20px;
+        line-height: 1.25;
       }
-      #calculatorPage .count { min-width: 40px; font-size: 26px; }
-      #calculatorPage .summary-card { margin-top: 7px; border-radius: 18px; }
-      #calculatorPage .metric { padding: 7px 11px; }
-      #calculatorPage .metric-label { font-size: 14px; }
-      #calculatorPage #totalPeople,
-      #calculatorPage #totalAmount { font-size: 27px; margin-top: 0; }
-      #calculatorPage .cash-section { padding: 7px 10px 8px; }
-      #calculatorPage .field-label { font-size: 15px; margin-bottom: 5px; }
-      #calculatorPage .money-input { height: 42px; font-size: 22px; border-radius: 12px; }
-      #calculatorPage .cash-keypad { gap: 5px; margin-top: 5px; }
-      #calculatorPage .cash-key { min-height: 43px; border-radius: 11px; font-size: 22px; }
-      #calculatorPage .cash-key.utility { font-size: 17px; }
-      #calculatorPage .change-box {
-        min-height: 44px;
-        margin-top: 5px;
-        padding: 6px 10px;
-        border-radius: 12px;
-        font-size: 17px;
+      #calculatorPage .ticket-inline-price {
+        font-size: 15px;
+        color: #70798a;
       }
-      #calculatorPage .change-amount { font-size: 26px; }
-      #calculatorPage .action-row { margin-top: 6px; }
-      #calculatorPage .btn { min-height: 44px; padding: 8px 10px; font-size: 16px; }
-    }
-
-    @media (max-width: 390px), (max-height: 720px) {
-      .topbar { padding-top: max(8px, env(safe-area-inset-top)); padding-bottom: 6px; }
-      .tab-btn { padding: 8px 7px; }
-      #calculatorPage .ticket-row { min-height: 53px; padding-top: 3px; padding-bottom: 3px; }
-      #calculatorPage .stepper { grid-template-columns: 46px 36px 46px; }
-      #calculatorPage .stepper button { width: 46px; height: 46px; }
-      #calculatorPage .count { min-width: 36px; font-size: 24px; }
-      #calculatorPage .cash-key { min-height: 40px; }
-      #calculatorPage .metric { padding-top: 5px; padding-bottom: 5px; }
-      #calculatorPage .cash-section { padding-top: 5px; padding-bottom: 6px; }
-      #calculatorPage .money-input { height: 39px; }
-      #calculatorPage .change-box { min-height: 40px; }
-      #calculatorPage .btn { min-height: 41px; }
-    }
-
-
-
-    /* 2026-08-11：收現金額放大＋數字鍵盤窄版集中 */
-    #calculatorPage .money-input.keypad-display {
-      height: 58px;
-      padding-left: 58px;
-      padding-right: 16px;
-      font-size: 32px;
-      font-weight: 950;
-      color: #CD5C5C;
-      text-align: right;
-      letter-spacing: .01em;
-    }
-    #calculatorPage .cash-display-wrap .money-prefix {
-      font-size: 21px;
-      font-weight: 950;
-      color: #6e778a;
-    }
-    #calculatorPage .cash-keypad {
-      width: min(300px, 88%);
-      margin: 7px auto 0;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 6px;
-    }
-    #calculatorPage .cash-key {
-      min-height: 50px;
-      padding: 0;
-      font-size: 24px;
-    }
-
-    @media (max-width: 520px) {
-      #calculatorPage .money-input.keypad-display {
-        height: 56px;
-        font-size: 31px;
-        border-radius: 13px;
-      }
-      #calculatorPage .cash-display-wrap .money-prefix { font-size: 20px; }
-      #calculatorPage .cash-keypad {
-        width: min(286px, 86vw);
+      #calculatorPage .stepper {
+        grid-template-columns: 54px 46px 54px;
         gap: 5px;
-        margin-top: 6px;
       }
-      #calculatorPage .cash-key {
-        min-height: 48px;
-        border-radius: 12px;
-        font-size: 23px;
+      #calculatorPage .stepper button {
+        width: 54px;
+        height: 54px;
+        border-radius: 15px;
+        font-size: 31px;
       }
-      #calculatorPage .cash-key.utility { font-size: 17px; }
-    }
-
-    @media (max-width: 390px), (max-height: 720px) {
-      #calculatorPage .money-input.keypad-display {
-        height: 52px;
-        font-size: 29px;
-      }
-      #calculatorPage .cash-keypad { width: min(272px, 84vw); gap: 4px; }
-      #calculatorPage .cash-key { min-height: 44px; }
-    }
-
-
-
-    /* 2026-08-11：收現資訊與數字鍵盤同列、去除小圖示、質感版 */
-    #calculatorPage .cash-section {
-      padding: 10px 12px;
-    }
-    #calculatorPage .cash-composer {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 218px;
-      gap: 12px;
-      align-items: stretch;
-    }
-    #calculatorPage .cash-info-panel {
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-    #calculatorPage .field-label,
-    #calculatorPage .metric-label {
-      color: #667085;
-      font-weight: 900;
-      letter-spacing: .01em;
-    }
-    #calculatorPage .money-input.keypad-display {
-      height: 62px;
-      font-size: 34px;
-      background: linear-gradient(180deg, #ffffff 0%, #fafbfe 100%);
-      border: 1px solid #dfe4ec;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.9);
-    }
-    #calculatorPage .change-box {
-      flex: 1;
-      min-height: 62px;
-      margin-top: 8px;
-      padding: 10px 14px;
-      border: 1px solid #e1e6ee;
-      background: linear-gradient(180deg, #f8fafc 0%, #f1f4f8 100%);
-    }
-    #calculatorPage .change-box strong {
-      font-size: 18px;
-      color: #465166;
-    }
-    #calculatorPage .change-amount {
-      font-size: 30px;
-      color: #CD5C5C;
-    }
-    #calculatorPage .cash-keypad {
-      width: 218px;
-      margin: 0;
-      gap: 5px;
-      align-self: stretch;
-    }
-    #calculatorPage .cash-key {
-      min-height: 50px;
-      border-radius: 12px;
-      border: 1px solid #dde3eb;
-      background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
-      color: #1f2937;
-      box-shadow: 0 3px 8px rgba(42,55,86,.06), inset 0 1px 0 rgba(255,255,255,.95);
-    }
-    #calculatorPage .cash-key.utility {
-      color: #536075;
-      background: linear-gradient(180deg, #f2f5f8 0%, #e9eef4 100%);
-    }
-    #calculatorPage .metric-label,
-    #calculatorPage .field-label { font-size: 16px; }
-
-    @media (max-width: 520px) {
-      #calculatorPage .cash-section { padding: 8px 10px; }
-      #calculatorPage .cash-composer {
-        grid-template-columns: minmax(0, 1fr) 204px;
-        gap: 9px;
-      }
-      #calculatorPage .money-input.keypad-display {
-        height: 58px;
+      #calculatorPage .count {
+        min-width: 46px;
         font-size: 32px;
       }
-      #calculatorPage .change-box {
-        min-height: 58px;
-        margin-top: 6px;
-        padding: 8px 11px;
-      }
-      #calculatorPage .change-box strong { font-size: 17px; }
-      #calculatorPage .change-amount { font-size: 28px; }
-      #calculatorPage .cash-keypad { width: 204px; gap: 4px; }
-      #calculatorPage .cash-key { min-height: 45px; font-size: 22px; border-radius: 11px; }
-      #calculatorPage .cash-key.utility { font-size: 15px; }
-      #calculatorPage .metric-label,
-      #calculatorPage .field-label { font-size: 15px; }
-    }
 
-    @media (max-width: 390px), (max-height: 720px) {
-      #calculatorPage .cash-composer {
-        grid-template-columns: minmax(0, 1fr) 190px;
-        gap: 7px;
+      /* 結帳摘要：四個資訊塊彼此分開 */
+      #calculatorPage .summary-card {
+        margin-top: 10px;
+        padding: 8px;
+        overflow: visible;
+        background: #fff;
+        border-radius: 20px;
       }
-      #calculatorPage .money-input.keypad-display { height: 54px; font-size: 29px; }
-      #calculatorPage .change-box { min-height: 54px; }
-      #calculatorPage .change-amount { font-size: 25px; }
-      #calculatorPage .cash-keypad { width: 190px; }
-      #calculatorPage .cash-key { min-height: 41px; font-size: 20px; }
-    }
+      #calculatorPage .summary-top {
+        display: grid;
+        grid-template-columns: .78fr 1.45fr;
+        gap: 8px;
+      }
+      #calculatorPage .metric {
+        min-width: 0;
+        padding: 11px 12px;
+        border-radius: 15px;
+        background: #f5f6f8;
+        border: 1px solid #e7e9ee;
+      }
+      #calculatorPage .metric + .metric {
+        border-left: 1px solid #eadfd9;
+      }
+      #calculatorPage .metric:nth-child(2) {
+        background: #fff6f1;
+        border-color: #f0ded5;
+      }
+      #calculatorPage .metric-label {
+        font-size: 15px;
+        line-height: 1.2;
+        color: #687181;
+      }
+      #calculatorPage #totalPeople {
+        margin-top: 4px;
+        font-size: 32px;
+        color: #202632;
+        line-height: 1.05;
+      }
+      #calculatorPage #totalAmount {
+        margin-top: 4px;
+        font-size: 40px;
+        color: #a64b3c;
+        white-space: nowrap;
+      }
+      #calculatorPage #totalAmount .currency-prefix {
+        font-size: .56em;
+      }
 
-    /* 2026-08-11：收現區再縮窄、鍵盤加大 */
-    #calculatorPage .cash-composer {
-      grid-template-columns: minmax(0, 0.68fr) 238px;
-      gap: 6px;
-    }
-    #calculatorPage .cash-keypad {
-      width: 238px;
-      gap: 5px;
-    }
-    #calculatorPage .cash-key {
-      min-height: 52px;
-      font-size: 25px;
-      border-radius: 12px;
-    }
-    #calculatorPage .cash-key.utility { font-size: 17px; }
+      #calculatorPage .cash-section {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 8px;
+        padding: 8px 0 0;
+        border-top: 0;
+      }
+      #calculatorPage .cash-entry-block {
+        padding: 10px 11px 11px;
+        border-radius: 15px;
+        background: #f2f8f6;
+        border: 1px solid #dceae6;
+      }
+      #calculatorPage .field-label[for="cashInput"] {
+        margin-bottom: 6px;
+        color: #427e72;
+        font-size: 16px;
+        line-height: 1.2;
+      }
+      #calculatorPage .money-input-wrap {
+        border-radius: 12px;
+      }
+      #calculatorPage .money-prefix {
+        left: 14px;
+        font-size: 21px;
+        color: #505866;
+      }
+      #calculatorPage .money-input {
+        height: 59px;
+        padding: 0 12px 0 48px;
+        border-radius: 12px;
+        background: #fff;
+        border-color: #d7e3df;
+        font-size: 36px;
+        color: #549688;
+      }
 
-    @media (max-width: 520px) {
-      #calculatorPage .cash-composer {
-        grid-template-columns: minmax(0, 1fr) 228px;
-        gap: 6px;
+      #calculatorPage .change-box,
+      #calculatorPage .change-box.positive,
+      #calculatorPage .change-box.negative {
+        min-height: 74px;
+        margin-top: 0;
+        padding: 11px 12px;
+        border-radius: 15px;
+        background: #fff3f1;
+        border: 1px solid #f0d8d3;
+        box-shadow: none;
+        color: #d4473b;
       }
-      #calculatorPage .cash-keypad { width: 228px; gap: 5px; }
-      #calculatorPage .cash-key { min-height: 49px; font-size: 24px; }
-      #calculatorPage .cash-info-panel { min-width: 0; }
-      #calculatorPage .money-input.keypad-display {
-        padding-left: 48px;
-        padding-right: 10px;
-        font-size: 30px;
+      #calculatorPage .change-box strong {
+        font-size: 17px;
+        color: #a84a40;
       }
-      #calculatorPage .cash-display-wrap .money-prefix { left: 11px; font-size: 18px; }
-      #calculatorPage .change-box { padding-left: 10px; padding-right: 10px; }
-      #calculatorPage .change-box strong { font-size: 16px; }
-      #calculatorPage .change-amount { font-size: 27px; }
-    }
+      #calculatorPage .change-amount {
+        font-size: 40px;
+        color: #d4473b;
+        white-space: nowrap;
+      }
+      #calculatorPage .change-amount .currency-prefix {
+        font-size: .56em;
+      }
 
-    @media (max-width: 390px), (max-height: 720px) {
-      #calculatorPage .cash-composer {
-        grid-template-columns: minmax(0, 1fr) 214px;
-        gap: 5px;
+      /* 操作列貼近手指區，滑到下方仍容易操作 */
+      #calculatorPage .action-row {
+        position: sticky;
+        bottom: 0;
+        z-index: 18;
+        grid-template-columns: .82fr 1.5fr;
+        gap: 8px;
+        margin: 10px -4px 0;
+        padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+        background: rgba(246,248,252,.94);
+        backdrop-filter: blur(14px);
       }
-      #calculatorPage .cash-keypad { width: 214px; gap: 4px; }
-      #calculatorPage .cash-key { min-height: 46px; font-size: 23px; }
-      #calculatorPage .money-input.keypad-display { font-size: 27px; }
-      #calculatorPage .change-amount { font-size: 24px; }
-    }
-
-
-
-    /* 2026-08-11：收現區最終排版—鍵盤填滿右側，不留空白 */
-    #calculatorPage .cash-composer {
-      display: grid;
-      grid-template-columns: minmax(0, 42%) minmax(0, 58%);
-      gap: 8px;
-      width: 100%;
-      align-items: stretch;
-    }
-    #calculatorPage .cash-info-panel {
-      width: 100%;
-      min-width: 0;
-    }
-    #calculatorPage .cash-keypad {
-      width: 100%;
-      max-width: none;
-      margin: 0;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 6px;
-      align-self: stretch;
-    }
-    #calculatorPage .cash-key {
-      width: 100%;
-      min-width: 0;
-      min-height: 52px;
-      font-size: 25px;
-    }
-
-    @media (max-width: 520px) {
-      #calculatorPage .cash-composer {
-        grid-template-columns: minmax(0, 41%) minmax(0, 59%);
-        gap: 7px;
+      #calculatorPage .action-row .btn {
+        min-height: 54px;
+        border-radius: 15px;
+        font-size: 18px;
       }
-      #calculatorPage .cash-keypad {
-        width: 100%;
-        max-width: none;
-        gap: 5px;
-      }
-      #calculatorPage .cash-key {
-        width: 100%;
-        min-height: 49px;
-        font-size: 24px;
-      }
-    }
-
-    @media (max-width: 390px), (max-height: 720px) {
-      #calculatorPage .cash-composer {
-        grid-template-columns: minmax(0, 40%) minmax(0, 60%);
-        gap: 6px;
-      }
-      #calculatorPage .cash-keypad {
-        width: 100%;
-        max-width: none;
-        gap: 4px;
-      }
-      #calculatorPage .cash-key {
-        width: 100%;
-        min-height: 46px;
-        font-size: 23px;
+      #calculatorPage #checkoutBtn {
+        font-size: 19px;
       }
     }
-</style>
-
-<style>
-
-  #calculatorPage .cash-section {
-    background: #FFFCEB;
-  }
-
-  #calculatorPage .money-input.keypad-display {
-    color: #549688;
-  }
-
-  #calculatorPage .money-input.keypad-display::placeholder {
-    color: #9aa3af;
-  }
-
-  #calculatorPage .cash-display-wrap .money-prefix {
-    color: #549688;
-  }
-
-
-
-  /* 標題縮小，讓視覺重點回到售票操作 */
-  #calculatorPage h1 {
-    font-size: clamp(19px, 4.2vw, 24px);
-    line-height: 1.15;
-  }
-  #calculatorPage .subtitle {
-    font-size: 12px;
-  }
-
-  /* 票種名稱與票價放大 */
-  #calculatorPage .ticket-name {
-    font-size: 21px;
-    line-height: 1.18;
-  }
-  #calculatorPage .ticket-inline-price {
-    font-size: 18px;
-    font-weight: 900;
-  }
-
-  /* 票數與加減按鈕放大 */
-  #calculatorPage .count {
-    font-size: 34px;
-  }
-  #calculatorPage .stepper button {
-    font-size: 33px;
-  }
-
-  /* 總數 / 總金額 / 收現金額標籤與數字放大 */
-  #calculatorPage .metric-label,
-  #calculatorPage .field-label {
-    font-size: 18px;
-  }
-  #calculatorPage #totalPeople {
-    font-size: 34px;
-  }
-  #calculatorPage #totalAmount {
-    font-size: 36px;
-    color: #CD5C5C;
-  }
-  #calculatorPage .money-input.keypad-display {
-    font-size: 35px;
-    font-weight: 950;
-  }
-  #calculatorPage .cash-display-wrap .money-prefix {
-    font-size: 21px;
-    font-weight: 950;
-  }
-
-  /* 找零與數字鍵盤同步放大 */
-  #calculatorPage .change-box strong {
-    font-size: 19px;
-  }
-  #calculatorPage .change-amount {
-    font-size: 32px;
-  }
-  #calculatorPage .cash-key {
-    font-size: 27px;
-    font-weight: 950;
-  }
-  #calculatorPage .cash-key.utility {
-    font-size: 18px;
-  }
-  #calculatorPage .action-row .btn {
-    font-size: 18px;
-  }
-
-  @media (max-width: 520px) {
-    #calculatorPage h1 { font-size: 20px; }
-    #calculatorPage .ticket-name { font-size: 20px; }
-    #calculatorPage .ticket-inline-price { font-size: 17px; }
-    #calculatorPage .count { font-size: 32px; }
-    #calculatorPage .stepper button { font-size: 32px; }
-    #calculatorPage .metric-label,
-    #calculatorPage .field-label { font-size: 17px; }
-    #calculatorPage #totalPeople { font-size: 32px; }
-    #calculatorPage #totalAmount { font-size: 34px; }
-    #calculatorPage .money-input.keypad-display { font-size: 33px; }
-    #calculatorPage .cash-display-wrap .money-prefix { font-size: 20px; }
-    #calculatorPage .change-box strong { font-size: 18px; }
-    #calculatorPage .change-amount { font-size: 30px; }
-    #calculatorPage .cash-key { font-size: 26px; }
-    #calculatorPage .cash-key.utility { font-size: 17px; }
-    #calculatorPage .action-row .btn { font-size: 17px; }
-  }
-
-  /* 較矮手機避免因放大而超出一個畫面 */
-  @media (max-height: 720px) {
-    #calculatorPage .ticket-name { font-size: 19px; }
-    #calculatorPage .ticket-inline-price { font-size: 16px; }
-    #calculatorPage #totalPeople { font-size: 30px; }
-    #calculatorPage #totalAmount { font-size: 32px; }
-    #calculatorPage .money-input.keypad-display { font-size: 31px; }
-    #calculatorPage .change-amount { font-size: 28px; }
-    #calculatorPage .cash-key { font-size: 24px; }
-  }
 
 </style>
-
-<style>
-  /* ===== 2026-08-11：收現同格・質感版 ===== */
-
-  #calculatorPage .cash-section {
-    background:
-      radial-gradient(circle at 8% 0%, rgba(255,255,255,.88), transparent 34%),
-      linear-gradient(145deg, #FFFDF3 0%, #FFFCEB 55%, #FFF8D9 100%);
-    border-top: 1px solid #eee5bf;
-    padding: 12px;
-  }
-
-  #calculatorPage .cash-composer {
-    gap: 10px;
-    align-items: stretch;
-  }
-
-  /* 收現標題＋金額合併成同一格 */
-  #calculatorPage .cash-info-panel > .field-label {
-    margin: 0;
-    padding: 10px 14px 2px;
-    color: #6f756f;
-    font-size: 15px;
-    font-weight: 900;
-    letter-spacing: .04em;
-    background: linear-gradient(180deg, #ffffff 0%, #fffefa 100%);
-    border: 1px solid #e5dfc7;
-    border-bottom: 0;
-    border-radius: 17px 17px 0 0;
-    box-shadow:
-      0 8px 20px rgba(83, 76, 50, .06),
-      inset 0 1px 0 rgba(255,255,255,.95);
-  }
-
-  #calculatorPage .cash-display-wrap {
-    position: relative;
-    min-height: 64px;
-    display: flex;
-    align-items: center;
-    background: linear-gradient(180deg, #fffefa 0%, #ffffff 100%);
-    border: 1px solid #e5dfc7;
-    border-top: 0;
-    border-radius: 0 0 17px 17px;
-    overflow: hidden;
-    box-shadow:
-      0 10px 24px rgba(83, 76, 50, .075),
-      inset 0 -1px 0 rgba(255,255,255,.9);
-  }
-
-  #calculatorPage .money-input.keypad-display {
-    height: 62px;
-    border: 0;
-    border-radius: 0;
-    outline: 0;
-    background: transparent;
-    box-shadow: none;
-    padding-left: 58px;
-    padding-right: 14px;
-    color: #549688;
-    font-size: 34px;
-    font-weight: 950;
-    text-align: right;
-    letter-spacing: .01em;
-  }
-
-  #calculatorPage .money-input.keypad-display:focus {
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-  }
-
-  #calculatorPage .cash-display-wrap .money-prefix {
-    left: 14px;
-    color: #549688;
-    font-size: 20px;
-    font-weight: 950;
-    letter-spacing: .01em;
-  }
-
-  #calculatorPage .money-input.keypad-display::placeholder {
-    color: #b7b9b0;
-    opacity: 1;
-  }
-
-  /* 找零區：比收現卡片低一階，避免搶焦點 */
-  #calculatorPage .change-box {
-    margin-top: 9px;
-    min-height: 60px;
-    padding: 10px 14px;
-    border: 1px solid rgba(218, 214, 196, .95);
-    border-radius: 15px;
-    background: rgba(255,255,255,.72);
-    box-shadow:
-      0 5px 14px rgba(83, 76, 50, .045),
-      inset 0 1px 0 rgba(255,255,255,.9);
-  }
-
-  #calculatorPage .change-box strong {
-    color: #626a73;
-    font-size: 17px;
-    font-weight: 900;
-  }
-
-  #calculatorPage .change-amount {
-    color: #CD5C5C;
-    font-size: 29px;
-    font-weight: 950;
-  }
-
-  /* 鍵盤：乾淨、柔和、有實體按鍵感 */
-  #calculatorPage .cash-keypad {
-    gap: 7px;
-  }
-
-  #calculatorPage .cash-key {
-    min-height: 52px;
-    border: 1px solid #dde1e5;
-    border-radius: 13px;
-    background: linear-gradient(180deg, #ffffff 0%, #f5f6f4 100%);
-    color: #283039;
-    font-size: 25px;
-    font-weight: 950;
-    box-shadow:
-      0 4px 10px rgba(42,55,86,.07),
-      inset 0 1px 0 rgba(255,255,255,.96);
-    transition: transform .08s ease, box-shadow .08s ease, background .08s ease;
-  }
-
-  #calculatorPage .cash-key:active {
-    transform: translateY(1px) scale(.985);
-    background: #eef0ec;
-    box-shadow:
-      0 2px 5px rgba(42,55,86,.06),
-      inset 0 1px 2px rgba(60,70,80,.06);
-  }
-
-  #calculatorPage .cash-key.utility {
-    color: #59636b;
-    background: linear-gradient(180deg, #f2f4f2 0%, #e9edea 100%);
-    border-color: #d9dfdc;
-  }
-
-  /* 總結區稍微收斂，讓收現卡片成為視覺主角 */
-  #calculatorPage .summary-top {
-    background: linear-gradient(180deg, #ffffff 0%, #fcfcfa 100%);
-  }
-
-  #calculatorPage .summary-card {
-    border-color: #e7e8e2;
-    box-shadow:
-      0 12px 30px rgba(48, 58, 72, .08),
-      0 2px 6px rgba(48, 58, 72, .035);
-  }
-
-  @media (max-width: 520px) {
-    #calculatorPage .cash-section {
-      padding: 9px 10px 10px;
-    }
-
-    #calculatorPage .cash-composer {
-      grid-template-columns: minmax(0, 41%) minmax(0, 59%);
-      gap: 8px;
-    }
-
-    #calculatorPage .cash-info-panel > .field-label {
-      padding: 8px 11px 1px;
-      font-size: 14px;
-      border-radius: 15px 15px 0 0;
-    }
-
-    #calculatorPage .cash-display-wrap {
-      min-height: 58px;
-      border-radius: 0 0 15px 15px;
-    }
-
-    #calculatorPage .money-input.keypad-display {
-      height: 57px;
-      padding-left: 48px;
-      padding-right: 9px;
-      font-size: 30px;
-    }
-
-    #calculatorPage .cash-display-wrap .money-prefix {
-      left: 10px;
-      font-size: 18px;
-    }
-
-    #calculatorPage .change-box {
-      min-height: 56px;
-      margin-top: 7px;
-      padding: 8px 10px;
-      border-radius: 13px;
-    }
-
-    #calculatorPage .change-box strong {
-      font-size: 16px;
-    }
-
-    #calculatorPage .change-amount {
-      font-size: 26px;
-    }
-
-    #calculatorPage .cash-keypad {
-      gap: 5px;
-    }
-
-    #calculatorPage .cash-key {
-      min-height: 49px;
-      border-radius: 11px;
-      font-size: 24px;
-    }
-
-    #calculatorPage .cash-key.utility {
-      font-size: 16px;
-    }
-  }
-
-  @media (max-width: 390px), (max-height: 720px) {
-    #calculatorPage .cash-composer {
-      grid-template-columns: minmax(0, 40%) minmax(0, 60%);
-      gap: 6px;
-    }
-
-    #calculatorPage .cash-info-panel > .field-label {
-      padding-top: 7px;
-    }
-
-    #calculatorPage .cash-display-wrap {
-      min-height: 54px;
-    }
-
-    #calculatorPage .money-input.keypad-display {
-      height: 53px;
-      padding-left: 45px;
-      font-size: 27px;
-    }
-
-    #calculatorPage .cash-display-wrap .money-prefix {
-      font-size: 17px;
-    }
-
-    #calculatorPage .change-box {
-      min-height: 51px;
-      margin-top: 6px;
-    }
-
-    #calculatorPage .change-amount {
-      font-size: 23px;
-    }
-
-    #calculatorPage .cash-key {
-      min-height: 46px;
-      font-size: 22px;
-    }
-  }
-</style>
-
-
-<style>
-  /* 2026-08-11：收現改成與找零同列，同一格顯示 */
-  #calculatorPage .cash-info-panel > .field-label {
-    display: none;
-  }
-
-  #calculatorPage .cash-display-wrap {
-    position: relative;
-    min-height: 62px;
-    margin: 0;
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: center;
-    gap: 12px;
-    padding: 0 14px;
-    border: 1px solid rgba(218, 214, 196, .95);
-    border-radius: 15px;
-    background: rgba(255,255,255,.78);
-    box-shadow:
-      0 5px 14px rgba(83, 76, 50, .045),
-      inset 0 1px 0 rgba(255,255,255,.92);
-  }
-
-  #calculatorPage .cash-display-wrap::before {
-    content: '收現';
-    color: #626a73;
-    font-size: 17px;
-    font-weight: 900;
-    white-space: nowrap;
-  }
-
-  #calculatorPage .cash-display-wrap .money-prefix {
-    display: none;
-  }
-
-  #calculatorPage .money-input.keypad-display {
-    height: 60px;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
-    text-align: right;
-    color: #549688;
-    font-size: 31px;
-    font-weight: 950;
-    letter-spacing: .01em;
-  }
-
-  #calculatorPage .money-input.keypad-display:focus {
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-  }
-
-  #calculatorPage .money-input.keypad-display::placeholder {
-    color: #b7b9b0;
-    opacity: 1;
-  }
-
-  @media (max-width: 520px) {
-    #calculatorPage .cash-display-wrap {
-      min-height: 58px;
-      gap: 10px;
-      padding: 0 11px;
-      border-radius: 13px;
-    }
-
-    #calculatorPage .cash-display-wrap::before {
-      font-size: 16px;
-    }
-
-    #calculatorPage .money-input.keypad-display {
-      height: 56px;
-      font-size: 28px;
-    }
-  }
-
-  @media (max-width: 390px), (max-height: 720px) {
-    #calculatorPage .cash-display-wrap {
-      min-height: 54px;
-      gap: 8px;
-      padding: 0 10px;
-    }
-
-    #calculatorPage .cash-display-wrap::before {
-      font-size: 15px;
-    }
-
-    #calculatorPage .money-input.keypad-display {
-      height: 52px;
-      font-size: 25px;
-    }
-  }
-</style>
-
-
-<style>
-  /* 2026-08-11：收現/找零同級大字，移除陰影 */
-  #calculatorPage .cash-display-wrap,
-  #calculatorPage .change-box {
-    box-shadow: none !important;
-  }
-
-  #calculatorPage .money-input.keypad-display {
-    font-size: 31px !important;
-  }
-
-  #calculatorPage .change-amount {
-    font-size: 31px !important;
-  }
-
-  @media (max-width: 520px) {
-    #calculatorPage .money-input.keypad-display {
-      font-size: 28px !important;
-    }
-
-    #calculatorPage .change-amount {
-      font-size: 28px !important;
-    }
-  }
-
-  @media (max-width: 390px), (max-height: 720px) {
-    #calculatorPage .money-input.keypad-display {
-      font-size: 25px !important;
-    }
-
-    #calculatorPage .change-amount {
-      font-size: 25px !important;
-    }
-  }
-</style>
-
-
-<style>
-  /* 2026-08-11：淺黃色區塊取消陰影，並降低總金額/找零混淆 */
-
-  /* 淺黃色區塊改成乾淨平面，不要陰影 */
-  #calculatorPage .cash-section {
-    background: #FFFCEB !important;
-    box-shadow: none !important;
-    background-image: none !important;
-    border-top: 1px solid #eee3ac;
-  }
-
-  /* 整個摘要卡保留簡單卡片感，但不讓黃色區看起來浮起來 */
-  #calculatorPage .summary-card {
-    overflow: hidden;
-  }
-
-  /* 上方總額區做出資訊層級：改成「應收總額」且顏色和找零分開 */
-  #calculatorPage .summary-top {
-    background: #fffef8;
-  }
-
-  #calculatorPage .summary-top .metric:last-child {
-    background: #fffaf0;
-  }
-
-  #calculatorPage .summary-top .metric-label {
-    letter-spacing: .02em;
-  }
-
-  #calculatorPage #totalAmount {
-    color: #8A6A2F !important;
-    font-size: 30px;
-  }
-
-  /* 收現與找零同區，但找零保留較明確的名稱 */
-  #calculatorPage .cash-display-wrap::before,
-  #calculatorPage .change-box strong {
-    color: #626a73;
-    font-weight: 900;
-  }
-
-  /* 收現金額與找零金額同級大字 */
-  #calculatorPage .money-input.keypad-display,
-  #calculatorPage .change-amount {
-    font-size: 31px !important;
-  }
-
-  /* 找零採獨立色彩邏輯，避免和應收總額撞色 */
-  #calculatorPage .change-box {
-    border: 1px solid #e5dcc0;
-    background: rgba(255,255,255,.76);
-  }
-
-  #calculatorPage .change-box.positive {
-    background: #eef8f3;
-    border-color: #d4e9de;
-  }
-
-  #calculatorPage .change-box.positive .change-amount {
-    color: #549688 !important;
-  }
-
-  #calculatorPage .change-box.negative {
-    background: #fff1f1;
-    border-color: #efd0d0;
-  }
-
-  #calculatorPage .change-box.negative .change-amount {
-    color: #CD5C5C !important;
-  }
-
-  /* 收現金額維持你要的綠色 */
-  #calculatorPage .money-input.keypad-display {
-    color: #549688 !important;
-  }
-
-  @media (max-width: 520px) {
-    #calculatorPage #totalAmount {
-      font-size: 27px;
-    }
-
-    #calculatorPage .money-input.keypad-display,
-    #calculatorPage .change-amount {
-      font-size: 28px !important;
-    }
-  }
-
-  @media (max-width: 390px), (max-height: 720px) {
-    #calculatorPage #totalAmount {
-      font-size: 25px;
-    }
-
-    #calculatorPage .money-input.keypad-display,
-    #calculatorPage .change-amount {
-      font-size: 25px !important;
-    }
-  }
-</style>
-
-
-<style>
-  /* 2026-08-11：找零金額固定維持紅色 */
-  #calculatorPage .change-amount,
-  #calculatorPage .change-box.positive .change-amount,
-  #calculatorPage .change-box.negative .change-amount {
-    color: #CD5C5C !important;
-  }
-</style>
-
 </head>
 <body>
   <div class="app-shell">
@@ -1461,41 +745,25 @@
         <section class="card summary-card" aria-label="結帳摘要">
           <div class="summary-top">
             <div class="metric">
-              <div class="metric-label">總數</div>
+              <div class="metric-label">👥 總數</div>
               <div id="totalPeople" class="metric-value">0</div>
             </div>
             <div class="metric">
-              <div class="metric-label">應收總額</div>
-              <div id="totalAmount" class="metric-value">NT$ 0</div>
+              <div class="metric-label">💰 總金額</div>
+              <div id="totalAmount" class="metric-value"><span class="currency-prefix">$</span> <span class="money-number">0</span></div>
             </div>
           </div>
           <div class="cash-section">
-            <div class="cash-composer">
-              <div class="cash-info-panel">
-                <label class="field-label" for="cashInput">收現</label>
-                <div class="money-input-wrap cash-display-wrap">
-                  <span class="money-prefix">NT$</span>
-                  <input id="cashInput" class="money-input keypad-display" type="text" inputmode="none" readonly placeholder="NT$ 0" aria-label="收現金額" />
-                </div>
-                <div id="changeBox" class="change-box">
-                  <span><strong>找零金額</strong></span>
-                  <span id="changeAmount" class="change-amount">NT$ 0</span>
-                </div>
+            <div class="cash-entry-block">
+              <label class="field-label" for="cashInput">💵 收現金額</label>
+              <div class="money-input-wrap">
+                <span class="money-prefix">$</span>
+                <input id="cashInput" class="money-input" type="number" inputmode="numeric" min="0" step="1" placeholder="請輸入收現金額" autocomplete="off" />
               </div>
-              <div id="cashKeypad" class="cash-keypad" aria-label="收現金額數字鍵盤">
-                <button class="cash-key" type="button" data-cash-key="1">1</button>
-                <button class="cash-key" type="button" data-cash-key="2">2</button>
-                <button class="cash-key" type="button" data-cash-key="3">3</button>
-                <button class="cash-key" type="button" data-cash-key="4">4</button>
-                <button class="cash-key" type="button" data-cash-key="5">5</button>
-                <button class="cash-key" type="button" data-cash-key="6">6</button>
-                <button class="cash-key" type="button" data-cash-key="7">7</button>
-                <button class="cash-key" type="button" data-cash-key="8">8</button>
-                <button class="cash-key" type="button" data-cash-key="9">9</button>
-                <button class="cash-key utility" type="button" data-cash-action="clear">清除</button>
-                <button class="cash-key" type="button" data-cash-key="0">0</button>
-                <button class="cash-key utility backspace" type="button" data-cash-action="backspace" aria-label="刪除最後一位">←</button>
-              </div>
+            </div>
+            <div id="changeBox" class="change-box">
+              <span><strong>找零</strong></span>
+              <span id="changeAmount" class="change-amount"><span class="currency-prefix">$</span> <span class="money-number">0</span></span>
             </div>
           </div>
         </section>
@@ -1674,7 +942,12 @@
       }
 
       function money(value) {
-        return `NT$ ${Math.round(Number(value) || 0).toLocaleString('zh-TW')}`;
+        return `$ ${Math.round(Number(value) || 0).toLocaleString('zh-TW')}`;
+      }
+
+      function moneyHTML(value) {
+        const formatted = Math.round(Number(value) || 0).toLocaleString('zh-TW');
+        return `<span class="currency-prefix">$</span> <span class="money-number">${formatted}</span>`;
       }
 
       function localDateKey(isoString) {
@@ -1756,15 +1029,15 @@
       function updateCalculatorSummary() {
         const totals = currentTotals();
         $('#totalPeople').textContent = totals.people.toLocaleString('zh-TW');
-        $('#totalAmount').textContent = money(totals.amount);
-        $('#cashInput').value = state.cash === '' ? '' : money(state.cash);
-        $('#changeAmount').textContent = money(totals.change);
+        $('#totalAmount').innerHTML = moneyHTML(totals.amount);
+        $('#cashInput').value = state.cash;
+        $('#changeAmount').innerHTML = moneyHTML(totals.change);
 
         const changeBox = $('#changeBox');
         changeBox.classList.toggle('positive', totals.cash !== null && totals.change >= 0 && totals.people > 0);
         changeBox.classList.toggle('negative', totals.cash !== null && totals.change < 0 && totals.people > 0);
-        changeBox.querySelector('strong').textContent = totals.cash !== null && totals.change < 0 ? '尚差金額' : '找零金額';
-        $('#changeAmount').textContent = money(Math.abs(totals.change));
+        changeBox.querySelector('strong').textContent = totals.cash !== null && totals.change < 0 ? '尚差' : '找零';
+        $('#changeAmount').innerHTML = moneyHTML(Math.abs(totals.change));
 
         $('#checkoutBtn').disabled = !(totals.people > 0 && totals.cash !== null && totals.cash >= totals.amount);
         saveDraft();
@@ -1790,6 +1063,7 @@
         }
         if (totals.cash === null) {
           showToast('請輸入收現金額');
+          $('#cashInput').focus();
           return;
         }
         if (totals.cash < totals.amount) {
@@ -1850,22 +1124,22 @@
           return `<div class="empty-state"><div class="empty-icon">🧾</div><strong>尚無結帳紀錄</strong><div style="margin-top:5px">按下「結帳並記錄」後，最後一筆訂單會顯示在這裡。</div></div>`;
         }
         const lines = order.items.map(item => `
-          <div class="item-line"><span>${escapeHTML(item.name)} × ${Number(item.qty).toLocaleString('zh-TW')}</span><strong>${money(item.subtotal)}</strong></div>
+          <div class="item-line"><span>${escapeHTML(item.name)} × ${Number(item.qty).toLocaleString('zh-TW')}</span><strong>${moneyHTML(item.subtotal)}</strong></div>
         `).join('');
         return `
           <div class="section-title-row">
             <div><span class="pill">最後一筆訂單</span></div>
             <div style="display:flex;align-items:center;gap:8px">
               <span class="order-time">${formatDateTime(order.createdAt)}</span>
-              <button class="mini-btn" type="button" data-delete-latest="${escapeHTML(order.id)}">刪除此筆</button>
+
             </div>
           </div>
           <h3>訂單 ${escapeHTML(order.orderNo || order.id)}</h3>
           <div class="item-lines">${lines}</div>
-          <div class="total-line"><span>${order.totalTickets} 張票</span><span>${money(order.totalAmount)}</span></div>
+          <div class="total-line"><span>${order.totalTickets} 張票</span><span>${moneyHTML(order.totalAmount)}</span></div>
           <div class="item-lines" style="margin-top:10px">
-            <div class="item-line"><span>收現</span><strong>${money(order.cashReceived)}</strong></div>
-            <div class="item-line"><span>找零</span><strong>${money(order.change)}</strong></div>
+            <div class="item-line"><span>收現</span><strong>${moneyHTML(order.cashReceived)}</strong></div>
+            <div class="item-line"><span>找零</span><strong>${moneyHTML(order.change)}</strong></div>
           </div>
         `;
       }
@@ -1916,7 +1190,7 @@
           <div class="ticket-summary-item">
             <div class="ticket-summary-name">${escapeHTML(item.name)}</div>
             <div class="ticket-summary-qty">${Number(item.qty).toLocaleString('zh-TW')} 張</div>
-            <div class="ticket-summary-money">${money(item.subtotal)}</div>
+            <div class="ticket-summary-money">${moneyHTML(item.subtotal)}</div>
           </div>
         `).join('')}</div>`;
       }
@@ -1930,12 +1204,10 @@
             <article class="order-entry">
               <div class="order-entry-head">
                 <div>
-                  <div class="order-no">${formatTime(order.createdAt)}｜${money(order.totalAmount)}</div>
-                  <div class="order-time">${order.totalTickets} 張｜收現 ${money(order.cashReceived)}｜找零 ${money(order.change)}</div>
+                  <div class="order-no">${formatTime(order.createdAt)}｜${moneyHTML(order.totalAmount)}</div>
+                  <div class="order-time">${order.totalTickets} 張｜收現 ${moneyHTML(order.cashReceived)}｜找零 ${moneyHTML(order.change)}</div>
                 </div>
-                <div class="order-actions">
-                  <button class="mini-btn" type="button" data-delete-order="${escapeHTML(order.id)}">刪除此筆</button>
-                </div>
+
               </div>
               <div class="order-items">${itemText || '無票種明細'}</div>
             </article>
@@ -1946,12 +1218,12 @@
           <section class="card daily-card" data-date="${group.dateKey}">
             <div class="daily-head" data-expand-date="${group.dateKey}">
               <div class="daily-title">${formatDate(group.dateKey)} <span class="expand-mark">⌄</span></div>
-              <div class="daily-meta">點此展開 ${group.orders.length} 筆訂單，可逐筆刪除</div>
+              <div class="daily-meta">點此展開 ${group.orders.length} 筆訂單</div>
             </div>
             <div class="daily-stats">
               <div class="small-metric"><div class="small-label">訂單數</div><div class="small-value">${group.orders.length} 筆</div></div>
               <div class="small-metric"><div class="small-label">總票數</div><div class="small-value">${group.totalTickets} 張</div></div>
-              <div class="small-metric"><div class="small-label">總金額</div><div class="small-value">${money(group.totalAmount)}</div></div>
+              <div class="small-metric"><div class="small-label">總金額</div><div class="small-value">${moneyHTML(group.totalAmount)}</div></div>
             </div>
             <div class="daily-ticket-summary">${ticketSummary}</div>
             <div class="orders-wrap">${orders}</div>
@@ -1971,7 +1243,7 @@
           <div class="daily-stats" style="margin:0 -17px">
             <div class="small-metric"><div class="small-label">訂單數</div><div class="small-value">${today.orders.length} 筆</div></div>
             <div class="small-metric"><div class="small-label">總票數</div><div class="small-value">${today.totalTickets} 張</div></div>
-            <div class="small-metric"><div class="small-label">總金額</div><div class="small-value">${money(today.totalAmount)}</div></div>
+            <div class="small-metric"><div class="small-label">總金額</div><div class="small-value">${moneyHTML(today.totalAmount)}</div></div>
           </div>
           <div class="daily-ticket-summary" style="padding:14px 0 0">${ticketLines}</div>
         `;
@@ -2048,6 +1320,41 @@
       function csvCell(value) {
         const text = String(value ?? '');
         return `"${text.replaceAll('"', '""')}"`;
+      }
+
+      function backupData() {
+        const payload = {
+          version: 2,
+          exportedAt: new Date().toISOString(),
+          ticketTypes: state.ticketTypes,
+          orders: state.orders
+        };
+        downloadBlob(`票價計算器備份_${localDateKey(new Date().toISOString())}.json`, JSON.stringify(payload, null, 2), 'application/json');
+        showToast('備份檔已下載');
+      }
+
+      async function restoreData(file) {
+        if (!file) return;
+        try {
+          const data = JSON.parse(await file.text());
+          if (!Array.isArray(data.ticketTypes) || !Array.isArray(data.orders)) throw new Error('檔案格式不正確');
+          if (!confirm(`將還原 ${data.orders.length} 筆訂單，並覆蓋目前資料。確定繼續嗎？`)) return;
+          state.ticketTypes = data.ticketTypes;
+          state.orders = data.orders;
+          sanitizeState();
+          resetQuantities(false);
+          state.cash = '';
+          saveJSON(KEYS.ticketTypes, state.ticketTypes);
+          saveJSON(KEYS.orders, state.orders);
+          renderCalculator();
+          renderRecords();
+          showToast('資料已還原');
+        } catch (error) {
+          console.error(error);
+          alert('無法還原：請確認選擇的是本工具產生的 JSON 備份檔。');
+        } finally {
+          $('#restoreFileInput').value = '';
+        }
       }
 
       function downloadBlob(filename, content, type) {
@@ -2165,29 +1472,10 @@
           updateCalculatorSummary();
         });
 
-        $('#cashKeypad').addEventListener('click', event => {
-          const keyButton = event.target.closest('[data-cash-key]');
-          const actionButton = event.target.closest('[data-cash-action]');
-
-          if (keyButton) {
-            const digit = keyButton.dataset.cashKey;
-            const current = state.cash === '' ? '' : String(state.cash);
-            const next = (current + digit).replace(/^0+(?=\d)/, '');
-            state.cash = Math.min(9999999, Math.max(0, Number(next) || 0));
-            updateCalculatorSummary();
-            return;
-          }
-
-          if (actionButton) {
-            if (actionButton.dataset.cashAction === 'clear') {
-              state.cash = '';
-            } else if (actionButton.dataset.cashAction === 'backspace') {
-              const current = state.cash === '' ? '' : String(state.cash);
-              const next = current.slice(0, -1);
-              state.cash = next === '' ? '' : Number(next);
-            }
-            updateCalculatorSummary();
-          }
+        $('#cashInput').addEventListener('input', event => {
+          const value = event.target.value;
+          state.cash = value === '' ? '' : Math.max(0, Math.floor(Number(value) || 0));
+          updateCalculatorSummary();
         });
 
         $('#clearBtn').addEventListener('click', () => {
@@ -2211,18 +1499,7 @@
           if (button) removeTicketType(Number(button.dataset.removeIndex));
         });
 
-        $('#latestOrderCard').addEventListener('click', event => {
-          const button = event.target.closest('[data-delete-latest]');
-          if (button) deleteOrder(button.dataset.deleteLatest);
-        });
-
         $('#dailyGroups').addEventListener('click', event => {
-          const deleteBtn = event.target.closest('[data-delete-order]');
-          if (deleteBtn) {
-            event.stopPropagation();
-            deleteOrder(deleteBtn.dataset.deleteOrder);
-            return;
-          }
           const head = event.target.closest('[data-expand-date]');
           if (head) head.closest('.daily-card').classList.toggle('expanded');
         });
@@ -2236,6 +1513,9 @@
 
         document.addEventListener('keydown', event => {
           if (event.key === 'Escape') closeSettings();
+          if (event.key === 'Enter' && !$('#checkoutBtn').disabled && document.activeElement === $('#cashInput')) {
+            checkout();
+          }
         });
       }
 
